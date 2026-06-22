@@ -1,0 +1,265 @@
+{
+  "roles": [
+    {
+      "id": "civilian",
+      "title": "Мирный",
+      "team": "town",
+      "description": "У тебя нет ночного действия. Днём обсуждай и голосуй, пытаясь вычислить мафию.",
+      "difficulty": "easy",
+      "emoji": "🙂"
+    },
+    {
+      "id": "mafia",
+      "title": "Мафия",
+      "team": "mafia",
+      "description": "Ночью вместе с другими мафиози выбираешь цель. Днём притворяешься мирным.",
+      "difficulty": "easy",
+      "emoji": "🕶️"
+    },
+    {
+      "id": "doctor",
+      "title": "Доктор",
+      "team": "town",
+      "description": "Ночью выбираешь одного игрока и пытаешься спасти его от убийства.",
+      "difficulty": "easy",
+      "emoji": "🩺"
+    },
+    {
+      "id": "detective",
+      "title": "Комиссар",
+      "team": "town",
+      "description": "Ночью проверяешь одного игрока и узнаёшь, связан ли он с мафией.",
+      "difficulty": "medium",
+      "emoji": "🕵️"
+    },
+    {
+      "id": "don",
+      "title": "Дон",
+      "team": "mafia",
+      "description": "Главарь мафии. Играет за мафию и усложняет анализ состава партии.",
+      "difficulty": "medium",
+      "emoji": "👔"
+    },
+    {
+      "id": "maniac",
+      "title": "Маньяк",
+      "team": "solo",
+      "description": "Играешь сам за себя. Ночью выбираешь отдельную жертву и мешаешь всем сторонам.",
+      "difficulty": "hard",
+      "emoji": "🔪"
+    },
+    {
+      "id": "bodyguard",
+      "title": "Телохранитель",
+      "team": "town",
+      "description": "Ночью прикрываешь одного игрока и можешь защитить его ценой риска для себя.",
+      "difficulty": "medium",
+      "emoji": "🛡️"
+    },
+    {
+      "id": "lover",
+      "title": "Любовница",
+      "team": "neutral",
+      "description": "Ночью отвлекаешь игрока, временно блокируя его действие.",
+      "difficulty": "medium",
+      "emoji": "💋"
+    },
+    {
+      "id": "journalist",
+      "title": "Журналист",
+      "team": "town",
+      "description": "Собираешь слухи и можешь один раз публично спутать планы мафии.",
+      "difficulty": "medium",
+      "emoji": "📰"
+    },
+    {
+      "id": "lawyer",
+      "title": "Адвокат",
+      "team": "mafia",
+      "description": "Защищаешь мафию разговорами и умеешь уводить подозрения.",
+      "difficulty": "medium",
+      "emoji": "⚖️"
+    }
+  ],
+  "presets": {
+    "classic": {
+      "title": "Классика",
+      "description": "Минимальный понятный состав для быстрой партии.",
+      "playerCounts": {
+        "4": [
+          "mafia",
+          "doctor",
+          "detective",
+          "civilian"
+        ],
+        "5": [
+          "mafia",
+          "doctor",
+          "detective",
+          "civilian",
+          "civilian"
+        ],
+        "6": [
+          "mafia",
+          "mafia",
+          "doctor",
+          "detective",
+          "civilian",
+          "civilian"
+        ],
+        "7": [
+          "mafia",
+          "mafia",
+          "doctor",
+          "detective",
+          "civilian",
+          "civilian",
+          "civilian"
+        ],
+        "8": [
+          "mafia",
+          "mafia",
+          "doctor",
+          "detective",
+          "bodyguard",
+          "civilian",
+          "civilian",
+          "civilian"
+        ],
+        "9": [
+          "mafia",
+          "mafia",
+          "doctor",
+          "detective",
+          "bodyguard",
+          "journalist",
+          "civilian",
+          "civilian",
+          "civilian"
+        ],
+        "10": [
+          "mafia",
+          "mafia",
+          "don",
+          "doctor",
+          "detective",
+          "bodyguard",
+          "journalist",
+          "civilian",
+          "civilian",
+          "civilian"
+        ],
+        "11": [
+          "mafia",
+          "mafia",
+          "don",
+          "doctor",
+          "detective",
+          "bodyguard",
+          "journalist",
+          "civilian",
+          "civilian",
+          "civilian",
+          "civilian"
+        ],
+        "12": [
+          "mafia",
+          "mafia",
+          "don",
+          "doctor",
+          "detective",
+          "bodyguard",
+          "lover",
+          "journalist",
+          "civilian",
+          "civilian",
+          "civilian",
+          "civilian"
+        ]
+      }
+    },
+    "expanded": {
+      "title": "Расширенная",
+      "description": "Больше специальных ролей и более хаотичные партии.",
+      "playerCounts": {
+        "6": [
+          "mafia",
+          "mafia",
+          "doctor",
+          "detective",
+          "lover",
+          "civilian"
+        ],
+        "7": [
+          "mafia",
+          "mafia",
+          "doctor",
+          "detective",
+          "lover",
+          "journalist",
+          "civilian"
+        ],
+        "8": [
+          "mafia",
+          "mafia",
+          "doctor",
+          "detective",
+          "bodyguard",
+          "lover",
+          "journalist",
+          "civilian"
+        ],
+        "9": [
+          "mafia",
+          "mafia",
+          "don",
+          "doctor",
+          "detective",
+          "bodyguard",
+          "lover",
+          "journalist",
+          "civilian"
+        ],
+        "10": [
+          "mafia",
+          "mafia",
+          "don",
+          "doctor",
+          "detective",
+          "bodyguard",
+          "lover",
+          "maniac",
+          "journalist",
+          "civilian"
+        ],
+        "11": [
+          "mafia",
+          "mafia",
+          "don",
+          "lawyer",
+          "doctor",
+          "detective",
+          "bodyguard",
+          "lover",
+          "maniac",
+          "journalist",
+          "civilian"
+        ],
+        "12": [
+          "mafia",
+          "mafia",
+          "don",
+          "lawyer",
+          "doctor",
+          "detective",
+          "bodyguard",
+          "lover",
+          "maniac",
+          "journalist",
+          "civilian",
+          "civilian"
+        ]
+      }
+    }
+  }
+}
