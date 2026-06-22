@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="/party_games_collection/">
 
   <meta charset="UTF-8">
@@ -29,18 +16,38 @@
   <meta name="apple-mobile-web-app-title" content="Сборник игр">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
   <title>Сборник игр</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- 💣 FIX: убрать эластичность iOS -->
   <style>
     html, body {
       margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+
+      /* ❌ убираем bounce */
+      overflow: hidden;
+
+      /* ❌ запрещаем прокрутку-резинку */
+      overscroll-behavior: none;
+
+      /* ❌ iOS scroll chaining */
+      -webkit-overflow-scrolling: auto;
+
       background: #FFF7F0;
+    }
+
+    /* Flutter canvas wrapper тоже фиксируем */
+    flutter-view, flt-glass-pane, flt-scene-host {
+      overscroll-behavior: none;
     }
   </style>
 </head>
+
 <body>
   <script>
     (function () {
@@ -63,7 +70,7 @@
         if (preference === 'dark') return true;
         if (preference === 'light') return false;
         return window.matchMedia &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches;
+          window.matchMedia('(prefers-color-scheme: dark)').matches;
       }
 
       function applyChrome() {
@@ -78,7 +85,7 @@
         }
 
         var statusMeta = document.querySelector(
-          'meta[name="apple-mobile-web-app-status-bar-style"]',
+          'meta[name="apple-mobile-web-app-status-bar-style"]'
         );
         if (statusMeta) {
           statusMeta.setAttribute('content', statusBarStyle);
@@ -91,6 +98,7 @@
       applyChrome();
     })();
   </script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
