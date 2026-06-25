@@ -1,0 +1,1182 @@
+[
+  {
+    "value": "стол",
+    "rating": "family"
+  },
+  {
+    "value": "стул",
+    "rating": "family"
+  },
+  {
+    "value": "диван",
+    "rating": "family"
+  },
+  {
+    "value": "кровать",
+    "rating": "family"
+  },
+  {
+    "value": "шкаф",
+    "rating": "family"
+  },
+  {
+    "value": "лампа",
+    "rating": "family"
+  },
+  {
+    "value": "зеркало",
+    "rating": "family"
+  },
+  {
+    "value": "часы",
+    "rating": "family"
+  },
+  {
+    "value": "телефон",
+    "rating": "family"
+  },
+  {
+    "value": "ноутбук",
+    "rating": "family"
+  },
+  {
+    "value": "клавиатура",
+    "rating": "family"
+  },
+  {
+    "value": "мышка",
+    "rating": "family"
+  },
+  {
+    "value": "холодильник",
+    "rating": "family"
+  },
+  {
+    "value": "чайник",
+    "rating": "family"
+  },
+  {
+    "value": "ложка",
+    "rating": "family"
+  },
+  {
+    "value": "вилка",
+    "rating": "family"
+  },
+  {
+    "value": "тарелка",
+    "rating": "family"
+  },
+  {
+    "value": "кружка",
+    "rating": "family"
+  },
+  {
+    "value": "рюкзак",
+    "rating": "family"
+  },
+  {
+    "value": "зонт",
+    "rating": "family"
+  },
+  {
+    "value": "велосипед",
+    "rating": "family"
+  },
+  {
+    "value": "машина",
+    "rating": "family"
+  },
+  {
+    "value": "поезд",
+    "rating": "family"
+  },
+  {
+    "value": "самолёт",
+    "rating": "family"
+  },
+  {
+    "value": "кошка",
+    "rating": "family"
+  },
+  {
+    "value": "собака",
+    "rating": "family"
+  },
+  {
+    "value": "лошадь",
+    "rating": "family"
+  },
+  {
+    "value": "медведь",
+    "rating": "family"
+  },
+  {
+    "value": "пингвин",
+    "rating": "family"
+  },
+  {
+    "value": "банан",
+    "rating": "family"
+  },
+  {
+    "value": "арбуз",
+    "rating": "family"
+  },
+  {
+    "value": "яблоко",
+    "rating": "family"
+  },
+  {
+    "value": "пицца",
+    "rating": "family"
+  },
+  {
+    "value": "бургер",
+    "rating": "family"
+  },
+  {
+    "value": "мороженое",
+    "rating": "family"
+  },
+  {
+    "value": "школа",
+    "rating": "family"
+  },
+  {
+    "value": "театр",
+    "rating": "family"
+  },
+  {
+    "value": "кинотеатр",
+    "rating": "family"
+  },
+  {
+    "value": "стадион",
+    "rating": "family"
+  },
+  {
+    "value": "пляж",
+    "rating": "family"
+  },
+  {
+    "value": "бассейн",
+    "rating": "family"
+  },
+  {
+    "value": "робот",
+    "rating": "family"
+  },
+  {
+    "value": "космос",
+    "rating": "family"
+  },
+  {
+    "value": "ракета",
+    "rating": "family"
+  },
+  {
+    "value": "книга",
+    "rating": "family"
+  },
+  {
+    "value": "карандаш",
+    "rating": "family"
+  },
+  {
+    "value": "тетрадь",
+    "rating": "family"
+  },
+  {
+    "value": "музей",
+    "rating": "family"
+  },
+  {
+    "value": "картина",
+    "rating": "family"
+  },
+  {
+    "value": "подарок",
+    "rating": "family"
+  },
+  {
+    "value": "ёлка",
+    "rating": "family"
+  },
+  {
+    "value": "снеговик",
+    "rating": "family"
+  },
+  {
+    "value": "солнце",
+    "rating": "family"
+  },
+  {
+    "value": "луна",
+    "rating": "family"
+  },
+  {
+    "value": "звезда",
+    "rating": "family"
+  },
+  {
+    "value": "футбол",
+    "rating": "family"
+  },
+  {
+    "value": "баскетбол",
+    "rating": "family"
+  },
+  {
+    "value": "теннис",
+    "rating": "family"
+  },
+  {
+    "value": "шахматы",
+    "rating": "family"
+  },
+  {
+    "value": "гитара",
+    "rating": "family"
+  },
+  {
+    "value": "пианино",
+    "rating": "family"
+  },
+  {
+    "value": "барабан",
+    "rating": "family"
+  },
+  {
+    "value": "камера",
+    "rating": "family"
+  },
+  {
+    "value": "очки",
+    "rating": "family"
+  },
+  {
+    "value": "шапка",
+    "rating": "family"
+  },
+  {
+    "value": "куртка",
+    "rating": "family"
+  },
+  {
+    "value": "ботинки",
+    "rating": "family"
+  },
+  {
+    "value": "расчёска",
+    "rating": "family"
+  },
+  {
+    "value": "мыло",
+    "rating": "family"
+  },
+  {
+    "value": "полотенце",
+    "rating": "family"
+  },
+  {
+    "value": "ключ",
+    "rating": "family"
+  },
+  {
+    "value": "дверь",
+    "rating": "family"
+  },
+  {
+    "value": "окно",
+    "rating": "family"
+  },
+  {
+    "value": "лифт",
+    "rating": "family"
+  },
+  {
+    "value": "парк",
+    "rating": "family"
+  },
+  {
+    "value": "магазин",
+    "rating": "family"
+  },
+  {
+    "value": "аптека",
+    "rating": "family"
+  },
+  {
+    "value": "больница",
+    "rating": "family"
+  },
+  {
+    "value": "ресторан",
+    "rating": "family"
+  },
+  {
+    "value": "кафе",
+    "rating": "family"
+  },
+  {
+    "value": "библиотека",
+    "rating": "family"
+  },
+  {
+    "value": "пилот",
+    "rating": "family"
+  },
+  {
+    "value": "фермер",
+    "rating": "family"
+  },
+  {
+    "value": "бариста",
+    "rating": "family"
+  },
+  {
+    "value": "повар",
+    "rating": "family"
+  },
+  {
+    "value": "дракон",
+    "rating": "family"
+  },
+  {
+    "value": "единорог",
+    "rating": "family"
+  },
+  {
+    "value": "пират",
+    "rating": "family"
+  },
+  {
+    "value": "волшебник",
+    "rating": "family"
+  },
+  {
+    "value": "рыцарь",
+    "rating": "family"
+  },
+  {
+    "value": "динозавр",
+    "rating": "family"
+  },
+  {
+    "value": "панда",
+    "rating": "family"
+  },
+  {
+    "value": "жираф",
+    "rating": "family"
+  },
+  {
+    "value": "кенгуру",
+    "rating": "family"
+  },
+  {
+    "value": "дельфин",
+    "rating": "family"
+  },
+  {
+    "value": "черепаха",
+    "rating": "family"
+  },
+  {
+    "value": "вертолёт",
+    "rating": "family"
+  },
+  {
+    "value": "автобус",
+    "rating": "family"
+  },
+  {
+    "value": "такси",
+    "rating": "family"
+  },
+  {
+    "value": "мотоцикл",
+    "rating": "family"
+  },
+  {
+    "value": "трактор",
+    "rating": "family"
+  },
+  {
+    "value": "экскаватор",
+    "rating": "family"
+  },
+  {
+    "value": "молоток",
+    "rating": "family"
+  },
+  {
+    "value": "дрель",
+    "rating": "family"
+  },
+  {
+    "value": "отвёртка",
+    "rating": "family"
+  },
+  {
+    "value": "кисть",
+    "rating": "family"
+  },
+  {
+    "value": "краска",
+    "rating": "family"
+  },
+  {
+    "value": "замок",
+    "rating": "family"
+  },
+  {
+    "value": "мост",
+    "rating": "family"
+  },
+  {
+    "value": "река",
+    "rating": "family"
+  },
+  {
+    "value": "водопад",
+    "rating": "family"
+  },
+  {
+    "value": "остров",
+    "rating": "family"
+  },
+  {
+    "value": "пустыня",
+    "rating": "family"
+  },
+  {
+    "value": "гора",
+    "rating": "family"
+  },
+  {
+    "value": "лес",
+    "rating": "family"
+  },
+  {
+    "value": "джунгли",
+    "rating": "family"
+  },
+  {
+    "value": "сапог",
+    "rating": "family"
+  },
+  {
+    "value": "носок",
+    "rating": "family"
+  },
+  {
+    "value": "перчатка",
+    "rating": "family"
+  },
+  {
+    "value": "шарф",
+    "rating": "family"
+  },
+  {
+    "value": "подушка",
+    "rating": "family"
+  },
+  {
+    "value": "одеяло",
+    "rating": "family"
+  },
+  {
+    "value": "будильник",
+    "rating": "family"
+  },
+  {
+    "value": "тостер",
+    "rating": "family"
+  },
+  {
+    "value": "кофе",
+    "rating": "family"
+  },
+  {
+    "value": "чай",
+    "rating": "family"
+  },
+  {
+    "value": "сок",
+    "rating": "family"
+  },
+  {
+    "value": "лимон",
+    "rating": "family"
+  },
+  {
+    "value": "апельсин",
+    "rating": "family"
+  },
+  {
+    "value": "груша",
+    "rating": "family"
+  },
+  {
+    "value": "ананас",
+    "rating": "family"
+  },
+  {
+    "value": "клубника",
+    "rating": "family"
+  },
+  {
+    "value": "огурец",
+    "rating": "family"
+  },
+  {
+    "value": "помидор",
+    "rating": "family"
+  },
+  {
+    "value": "картошка",
+    "rating": "family"
+  },
+  {
+    "value": "морковь",
+    "rating": "family"
+  },
+  {
+    "value": "суп",
+    "rating": "family"
+  },
+  {
+    "value": "борщ",
+    "rating": "family"
+  },
+  {
+    "value": "котлета",
+    "rating": "family"
+  },
+  {
+    "value": "макароны",
+    "rating": "family"
+  },
+  {
+    "value": "рис",
+    "rating": "family"
+  },
+  {
+    "value": "салат",
+    "rating": "family"
+  },
+  {
+    "value": "торт",
+    "rating": "family"
+  },
+  {
+    "value": "печенье",
+    "rating": "family"
+  },
+  {
+    "value": "шоколад",
+    "rating": "family"
+  },
+  {
+    "value": "конфета",
+    "rating": "family"
+  },
+  {
+    "value": "карамель",
+    "rating": "family"
+  },
+  {
+    "value": "секунда",
+    "rating": "family"
+  },
+  {
+    "value": "минута",
+    "rating": "family"
+  },
+  {
+    "value": "час",
+    "rating": "family"
+  },
+  {
+    "value": "неделя",
+    "rating": "family"
+  },
+  {
+    "value": "месяц",
+    "rating": "family"
+  },
+  {
+    "value": "год",
+    "rating": "family"
+  },
+  {
+    "value": "зима",
+    "rating": "family"
+  },
+  {
+    "value": "лето",
+    "rating": "family"
+  },
+  {
+    "value": "осень",
+    "rating": "family"
+  },
+  {
+    "value": "весна",
+    "rating": "family"
+  },
+  {
+    "value": "кнопка",
+    "rating": "family"
+  },
+  {
+    "value": "экран",
+    "rating": "family"
+  },
+  {
+    "value": "зарядка",
+    "rating": "family"
+  },
+  {
+    "value": "розетка",
+    "rating": "family"
+  },
+  {
+    "value": "кабель",
+    "rating": "family"
+  },
+  {
+    "value": "наушники",
+    "rating": "family"
+  },
+  {
+    "value": "микрофон",
+    "rating": "family"
+  },
+  {
+    "value": "колонка",
+    "rating": "family"
+  },
+  {
+    "value": "пульт",
+    "rating": "family"
+  },
+  {
+    "value": "стикер",
+    "rating": "family"
+  },
+  {
+    "value": "конверт",
+    "rating": "family"
+  },
+  {
+    "value": "чемодан",
+    "rating": "family"
+  },
+  {
+    "value": "паспорт",
+    "rating": "family"
+  },
+  {
+    "value": "билет",
+    "rating": "family"
+  },
+  {
+    "value": "карта",
+    "rating": "family"
+  },
+  {
+    "value": "компас",
+    "rating": "family"
+  },
+  {
+    "value": "бинокль",
+    "rating": "family"
+  },
+  {
+    "value": "фонарик",
+    "rating": "family"
+  },
+  {
+    "value": "палатка",
+    "rating": "family"
+  },
+  {
+    "value": "костёр",
+    "rating": "family"
+  },
+  {
+    "value": "удочка",
+    "rating": "family"
+  },
+  {
+    "value": "стакан",
+    "rating": "family"
+  },
+  {
+    "value": "грабли",
+    "rating": "family"
+  },
+  {
+    "value": "лопата",
+    "rating": "family"
+  },
+  {
+    "value": "ведро",
+    "rating": "family"
+  },
+  {
+    "value": "лейка",
+    "rating": "family"
+  },
+  {
+    "value": "газон",
+    "rating": "family"
+  },
+  {
+    "value": "клумба",
+    "rating": "family"
+  },
+  {
+    "value": "семена",
+    "rating": "family"
+  },
+  {
+    "value": "гриб",
+    "rating": "family"
+  },
+  {
+    "value": "кактус",
+    "rating": "family"
+  },
+  {
+    "value": "тюльпан",
+    "rating": "family"
+  },
+  {
+    "value": "гарри поттер",
+    "rating": "family"
+  },
+  {
+    "value": "человек-паук",
+    "rating": "family"
+  },
+  {
+    "value": "бэтмен",
+    "rating": "family"
+  },
+  {
+    "value": "шрек",
+    "rating": "family"
+  },
+  {
+    "value": "губка боб",
+    "rating": "family"
+  },
+  {
+    "value": "пикачу",
+    "rating": "family"
+  },
+  {
+    "value": "терминатор",
+    "rating": "family"
+  },
+  {
+    "value": "чак норрис",
+    "rating": "family"
+  },
+  {
+    "value": "месси",
+    "rating": "family"
+  },
+  {
+    "value": "роналду",
+    "rating": "family"
+  },
+  {
+    "value": "майкл джексон",
+    "rating": "family"
+  },
+  {
+    "value": "илон маск",
+    "rating": "family"
+  },
+  {
+    "value": "трамп",
+    "rating": "family"
+  },
+  {
+    "value": "русалка",
+    "rating": "family"
+  },
+  {
+    "value": "вампир",
+    "rating": "family"
+  },
+  {
+    "value": "зомби",
+    "rating": "family"
+  },
+  {
+    "value": "майнкрафт",
+    "rating": "family"
+  },
+  {
+    "value": "лего",
+    "rating": "family"
+  },
+  {
+    "value": "комикс",
+    "rating": "family"
+  },
+  {
+    "value": "самокат",
+    "rating": "family"
+  },
+  {
+    "value": "ролики",
+    "rating": "family"
+  },
+  {
+    "value": "скейтборд",
+    "rating": "family"
+  },
+  {
+    "value": "метро",
+    "rating": "family"
+  },
+  {
+    "value": "галактика",
+    "rating": "family"
+  },
+  {
+    "value": "астронавт",
+    "rating": "family"
+  },
+  {
+    "value": "командир",
+    "rating": "family"
+  },
+  {
+    "value": "инженер",
+    "rating": "family"
+  },
+  {
+    "value": "пожарный",
+    "rating": "family"
+  },
+  {
+    "value": "полицейский",
+    "rating": "family"
+  },
+  {
+    "value": "учитель",
+    "rating": "family"
+  },
+  {
+    "value": "врач",
+    "rating": "family"
+  },
+  {
+    "value": "строитель",
+    "rating": "family"
+  },
+  {
+    "value": "дождь",
+    "rating": "family"
+  },
+  {
+    "value": "гроза",
+    "rating": "family"
+  },
+  {
+    "value": "радуга",
+    "rating": "family"
+  },
+  {
+    "value": "ветер",
+    "rating": "family"
+  },
+  {
+    "value": "снег",
+    "rating": "family"
+  },
+  {
+    "value": "ледник",
+    "rating": "family"
+  },
+  {
+    "value": "комната",
+    "rating": "family"
+  },
+  {
+    "value": "кухня",
+    "rating": "family"
+  },
+  {
+    "value": "спальня",
+    "rating": "family"
+  },
+  {
+    "value": "балкон",
+    "rating": "family"
+  },
+  {
+    "value": "гараж",
+    "rating": "family"
+  },
+  {
+    "value": "чердак",
+    "rating": "family"
+  },
+  {
+    "value": "хуй",
+    "rating": "dirty"
+  },
+  {
+    "value": "жопа",
+    "rating": "dirty"
+  },
+  {
+    "value": "сперма",
+    "rating": "dirty"
+  },
+  {
+    "value": "дилдо",
+    "rating": "dirty"
+  },
+  {
+    "value": "вибратор",
+    "rating": "dirty"
+  },
+  {
+    "value": "презерватив",
+    "rating": "dirty"
+  },
+  {
+    "value": "проститутка",
+    "rating": "dirty"
+  },
+  {
+    "value": "бордель",
+    "rating": "dirty"
+  },
+  {
+    "value": "оргия",
+    "rating": "dirty"
+  },
+  {
+    "value": "минет",
+    "rating": "dirty"
+  },
+  {
+    "value": "анус",
+    "rating": "dirty"
+  },
+  {
+    "value": "порно",
+    "rating": "dirty"
+  },
+  {
+    "value": "порноактриса",
+    "rating": "dirty"
+  },
+  {
+    "value": "мастурбатор",
+    "rating": "dirty"
+  },
+  {
+    "value": "адольф гитлер",
+    "rating": "dirty"
+  },
+  {
+    "value": "джеффри эпштейн",
+    "rating": "dirty"
+  },
+  {
+    "value": "героин",
+    "rating": "dirty"
+  },
+  {
+    "value": "кокаин",
+    "rating": "dirty"
+  },
+  {
+    "value": "метамфетамин",
+    "rating": "dirty"
+  },
+  {
+    "value": "смертная казнь",
+    "rating": "dirty"
+  },
+  {
+    "value": "эскорт",
+    "rating": "dirty"
+  },
+  {
+    "value": "секс-шоп",
+    "rating": "dirty"
+  },
+  {
+    "value": "фетиш",
+    "rating": "dirty"
+  },
+  {
+    "value": "камасутра",
+    "rating": "dirty"
+  },
+  {
+    "value": "эрекция",
+    "rating": "dirty"
+  },
+  {
+    "value": "лубрикант",
+    "rating": "dirty"
+  },
+  {
+    "value": "стрип-клуб",
+    "rating": "dirty"
+  },
+  {
+    "value": "похмелье",
+    "rating": "dirty"
+  },
+  {
+    "value": "запой",
+    "rating": "dirty"
+  },
+  {
+    "value": "передозировка",
+    "rating": "dirty"
+  },
+  {
+    "value": "труп",
+    "rating": "dirty"
+  },
+  {
+    "value": "убийца",
+    "rating": "dirty"
+  },
+  {
+    "value": "маньяк",
+    "rating": "dirty"
+  },
+  {
+    "value": "психушка",
+    "rating": "dirty"
+  },
+  {
+    "value": "сигарета",
+    "rating": "dirty"
+  },
+  {
+    "value": "вейп",
+    "rating": "dirty"
+  },
+  {
+    "value": "самогон",
+    "rating": "dirty"
+  },
+  {
+    "value": "виски",
+    "rating": "dirty"
+  },
+  {
+    "value": "пиво",
+    "rating": "dirty"
+  },
+  {
+    "value": "кальян",
+    "rating": "dirty"
+  },
+  {
+    "value": "абсент",
+    "rating": "dirty"
+  },
+  {
+    "value": "морг",
+    "rating": "dirty"
+  },
+  {
+    "value": "расчленение",
+    "rating": "dirty"
+  },
+  {
+    "value": "шантаж",
+    "rating": "dirty"
+  },
+  {
+    "value": "голая вечеринка",
+    "rating": "dirty"
+  },
+  {
+    "value": "стриптиз",
+    "rating": "dirty"
+  },
+  {
+    "value": "измена",
+    "rating": "dirty"
+  },
+  {
+    "value": "наркопритон",
+    "rating": "dirty"
+  },
+  {
+    "value": "казнь",
+    "rating": "dirty"
+  },
+  {
+    "value": "суицид",
+    "rating": "dirty"
+  },
+  {
+    "value": "черный рынок",
+    "rating": "dirty"
+  },
+  {
+    "value": "контрабанда",
+    "rating": "dirty"
+  },
+  {
+    "value": "шприц",
+    "rating": "dirty"
+  },
+  {
+    "value": "тюремная камера",
+    "rating": "dirty"
+  },
+  {
+    "value": "допрос",
+    "rating": "dirty"
+  },
+  {
+    "value": "отмывание денег",
+    "rating": "dirty"
+  },
+  {
+    "value": "рэкет",
+    "rating": "dirty"
+  },
+  {
+    "value": "фальшивый паспорт",
+    "rating": "dirty"
+  },
+  {
+    "value": "банда",
+    "rating": "dirty"
+  },
+  {
+    "value": "гроб",
+    "rating": "dirty"
+  },
+  {
+    "value": "похороны",
+    "rating": "dirty"
+  },
+  {
+    "value": "мошенник",
+    "rating": "dirty"
+  }
+]
