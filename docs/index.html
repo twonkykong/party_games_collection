@@ -12,7 +12,7 @@
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Сборник игр">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
@@ -55,9 +55,6 @@
         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       var lightColor = '#FFF7F0';
       var darkColor = '#171211';
-      var lightStatusBar = 'default';
-      var darkStatusBar = 'black-translucent';
-
       if (isIOS) {
         document.documentElement.classList.add('platform-ios');
         document.body.classList.add('platform-ios');
@@ -84,18 +81,10 @@
         var preference = readThemePreference();
         var isDark = resolveDarkMode(preference);
         var color = isDark ? darkColor : lightColor;
-        var statusBarStyle = isDark ? darkStatusBar : lightStatusBar;
 
         var themeMeta = document.querySelector('meta[name="theme-color"]');
         if (themeMeta) {
           themeMeta.setAttribute('content', color);
-        }
-
-        var statusMeta = document.querySelector(
-          'meta[name="apple-mobile-web-app-status-bar-style"]'
-        );
-        if (statusMeta) {
-          statusMeta.setAttribute('content', statusBarStyle);
         }
 
         document.documentElement.style.backgroundColor = color;

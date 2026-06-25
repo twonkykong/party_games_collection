@@ -21,12 +21,6 @@ Future<void> syncWebAppChrome({
     themeMeta.content = hex;
   }
 
-  final statusBarMeta = _findMeta('apple-mobile-web-app-status-bar-style');
-  if (statusBarMeta != null) {
-    statusBarMeta.content =
-        brightness == Brightness.dark ? 'black-translucent' : 'default';
-  }
-
   final root = web.document.documentElement as web.HTMLElement?;
   root?.style.backgroundColor = hex;
   web.document.body?.style.backgroundColor = hex;
@@ -38,5 +32,4 @@ Future<void> syncWebAppChrome({
     'color-scheme',
     brightness == Brightness.dark ? 'dark' : 'light',
   );
-  web.window.dispatchEvent(web.Event('resize'));
 }

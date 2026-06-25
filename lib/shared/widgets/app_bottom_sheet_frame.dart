@@ -8,7 +8,7 @@ class AppBottomSheetFrame extends StatelessWidget {
     super.key,
     this.header,
     this.body,
-    this.maxHeightFactor = 0.84,
+    this.maxHeightFactor = 0.88,
     this.bodyScrollable = true,
   });
 

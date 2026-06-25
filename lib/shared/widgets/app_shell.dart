@@ -1,10 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-
-import '../../core/services/app_reflow_signal_stub.dart'
-    if (dart.library.html) '../../core/services/app_reflow_signal_web.dart'
-    as app_reflow_signal;
 
 import '../../app/app_palette.dart';
 
@@ -27,16 +21,10 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
-  final List<Timer> _reflowTimers = <Timer>[];
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _scheduleDelayedReflow(),
-    );
-    app_reflow_signal.registerAppReflowSignal(_triggerReflow);
   }
 
   @override
@@ -48,17 +36,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _triggerReflow();
-      _scheduleDelayedReflow();
     }
-  }
-
-  void _scheduleDelayedReflow() {
-    for (final timer in _reflowTimers) {
-      timer.cancel();
-    }
-    _reflowTimers
-      ..clear()
-      ..add(Timer(const Duration(milliseconds: 120), _triggerReflow));
   }
 
   void _triggerReflow() {
@@ -70,11 +48,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    for (final timer in _reflowTimers) {
-      timer.cancel();
-    }
     WidgetsBinding.instance.removeObserver(this);
-    app_reflow_signal.unregisterAppReflowSignal();
     super.dispose();
   }
 
@@ -148,7 +122,14 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
                               width: 48,
                               child:
                                   widget.leading ??
-                                  BackButton(color: palette.textPrimary),
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.maybePop(context);
+                                    },
+                                    tooltip: '',
+                                    color: palette.textPrimary,
+                                    icon: const BackButtonIcon(),
+                                  ),
                             ),
                             const SizedBox(width: 4),
                             Expanded(
