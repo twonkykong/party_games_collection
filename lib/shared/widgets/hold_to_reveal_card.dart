@@ -78,6 +78,7 @@ class _HoldToRevealCardState extends State<HoldToRevealCard> {
     final palette = AppPalette.of(context);
 
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTapDown: (_) => _startHold(),
       onTapUp: (_) => _endHold(),
       onTapCancel: _endHold,

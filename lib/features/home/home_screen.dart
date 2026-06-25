@@ -58,7 +58,7 @@ class HomeScreen extends StatelessWidget {
                         }
                       },
                       icon: const Icon(Icons.tune_rounded),
-                      tooltip: '',
+                      tooltip: null,
                     ),
                   ],
                 ),

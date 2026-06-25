@@ -1343,6 +1343,7 @@ class _FinaleUnlockCardState extends State<_FinaleUnlockCard>
     final palette = AppPalette.of(context);
 
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTapDown: (_) => _startHold(),
       onTapUp: (_) => _cancelHold(),
       onTapCancel: _cancelHold,

@@ -13,7 +13,7 @@ import '../../shared/widgets/party_qr_code_card.dart';
 import '../../shared/widgets/party_qr_scan_sheet.dart';
 import '../../shared/widgets/section_card.dart';
 
-const _appBuildLabel = 'v1.0';
+const _appBuildLabel = 'v1.01';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

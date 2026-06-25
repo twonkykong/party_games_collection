@@ -75,16 +75,18 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
             Positioned(
               top: -80,
               right: -40,
-              child: Container(
-                width: 220,
-                height: 220,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      palette.backgroundOrbPrimary,
-                      palette.backgroundOrbPrimary.withValues(alpha: 0),
-                    ],
+              child: IgnorePointer(
+                child: Container(
+                  width: 220,
+                  height: 220,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        palette.backgroundOrbPrimary,
+                        palette.backgroundOrbPrimary.withValues(alpha: 0),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -92,16 +94,18 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
             Positioned(
               top: 120,
               left: -60,
-              child: Container(
-                width: 180,
-                height: 180,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      palette.backgroundOrbSecondary,
-                      palette.backgroundOrbSecondary.withValues(alpha: 0),
-                    ],
+              child: IgnorePointer(
+                child: Container(
+                  width: 180,
+                  height: 180,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        palette.backgroundOrbSecondary,
+                        palette.backgroundOrbSecondary.withValues(alpha: 0),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -126,7 +130,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
                                     onPressed: () {
                                       Navigator.maybePop(context);
                                     },
-                                    tooltip: '',
+                                    tooltip: null,
                                     color: palette.textPrimary,
                                     icon: const BackButtonIcon(),
                                   ),
