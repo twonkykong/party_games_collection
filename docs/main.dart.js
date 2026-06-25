@@ -26988,25 +26988,23 @@ break $label0$0}if("PORTRAIT_DOWN"===a){s=B.G1
 break $label0$0}if("LANDSCAPE_LEFT"===a){s=B.ob
 break $label0$0}if("LANDSCAPE_RIGHT"===a){s=B.oc
 break $label0$0}s=A.ax(A.eL(a,"deviceOrientation","Received an invalid device orientation"))}return s},
-axz(a,b){var s=0,r=A.p(t.H),q,p,o,n,m,l
+axz(a,b){var s=0,r=A.p(t.H),q,p,o,n,m
 var $async$axz=A.q(function(c,d){if(c===1)return A.m(d,r)
-while(true)switch(s){case 0:n="#"+B.d.eJ(B.d.vo(B.e.mJ(a.t(),16),8,"0"),2)
-m=self
-l=m.document.querySelector('meta[name="theme-color"]')
-if(l!=null)l.content=n
-q=m.document.documentElement
-l=q==null
-if(!l)q.style.backgroundColor=n
-p=m.document.body
-if(p!=null)p.style.backgroundColor=n
-o=m.document.querySelector("#app-status-bar-cover")
-if(o!=null)o.style.backgroundColor=n
-if(!l){l=q.style
+while(true)switch(s){case 0:o="#"+B.d.eJ(B.d.vo(B.e.mJ(a.t(),16),8,"0"),2)
+n=self
+m=n.document.querySelector('meta[name="theme-color"]')
+if(m!=null)m.content=o
+q=n.document.documentElement
+m=q==null
+if(!m)q.style.backgroundColor=o
+p=n.document.body
+if(p!=null)p.style.backgroundColor=o
+if(!m){m=q.style
 p=b===B.aa?"dark":"light"
-l.setProperty("color-scheme",p)}m=m.document.body
-if(m!=null){m=m.style
-l=b===B.aa?"dark":"light"
-m.setProperty("color-scheme",l)}return A.n(null,r)}})
+m.setProperty("color-scheme",p)}n=n.document.body
+if(n!=null){n=n.style
+m=b===B.aa?"dark":"light"
+n.setProperty("color-scheme",m)}return A.n(null,r)}})
 return A.o($async$axz,r)},
 aT_(){var s,r,q,p,o,n,m,l=null
 if($.a6==null)A.aOs()

@@ -25,10 +25,6 @@ Future<void> syncWebAppChrome({
   root?.style.backgroundColor = hex;
   web.document.body?.style.backgroundColor = hex;
 
-  final statusBarCover =
-      web.document.querySelector('#app-status-bar-cover') as web.HTMLElement?;
-  statusBarCover?.style.backgroundColor = hex;
-
   root?.style.setProperty(
     'color-scheme',
     brightness == Brightness.dark ? 'dark' : 'light',
