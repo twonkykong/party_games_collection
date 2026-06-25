@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/models/app_theme_preference.dart';
 import '../core/services/app_controller.dart';
 import '../core/services/app_chrome_sync.dart';
 import '../core/services/app_scope.dart';
@@ -26,11 +27,15 @@ class PartyGamesAppBootstrap extends StatefulWidget {
 class _PartyGamesAppBootstrapState extends State<PartyGamesAppBootstrap> {
   late final AppController _controller;
   late final Future<void> _bootstrapFuture;
+  late final ThemeData _lightTheme;
+  late final ThemeData _darkTheme;
 
   @override
   void initState() {
     super.initState();
     final assetLoader = AssetJsonLoader();
+    _lightTheme = buildAppTheme(Brightness.light);
+    _darkTheme = buildAppTheme(Brightness.dark);
     _controller = AppController(
       codec: const PartyCodeCodec(),
       storage: LocalStorageService(),
@@ -57,15 +62,15 @@ class _PartyGamesAppBootstrapState extends State<PartyGamesAppBootstrap> {
       builder: (context, snapshot) {
         return AppScope(
           controller: _controller,
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, _) {
+          child: ValueListenableBuilder<AppThemePreference>(
+            valueListenable: _controller.themePreferenceListenable,
+            builder: (context, themePreference, _) {
               return MaterialApp(
                 title: 'Сборник игр',
                 debugShowCheckedModeBanner: false,
-                theme: buildAppTheme(Brightness.light),
-                darkTheme: buildAppTheme(Brightness.dark),
-                themeMode: _controller.themePreference.themeMode,
+                theme: _lightTheme,
+                darkTheme: _darkTheme,
+                themeMode: themePreference.themeMode,
                 themeAnimationCurve: Curves.easeOutCubic,
                 themeAnimationDuration: const Duration(milliseconds: 320),
                 onGenerateRoute: AppRouter.onGenerateRoute,

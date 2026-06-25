@@ -102,13 +102,11 @@ class _AppChromeSyncState extends State<AppChromeSync>
       unawaited(runSync());
     });
 
-    for (final delay in const [90, 240]) {
-      _syncTimers.add(
-        Timer(Duration(milliseconds: delay), () {
-          unawaited(runSync());
-        }),
-      );
-    }
+    _syncTimers.add(
+      Timer(const Duration(milliseconds: 140), () {
+        unawaited(runSync());
+      }),
+    );
   }
 
   @override

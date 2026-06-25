@@ -9,12 +9,14 @@ class AppBottomSheetFrame extends StatelessWidget {
     this.header,
     this.body,
     this.maxHeightFactor = 0.84,
+    this.bodyScrollable = true,
   });
 
   final Widget child;
   final Widget? header;
   final Widget? body;
   final double maxHeightFactor;
+  final bool bodyScrollable;
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +86,21 @@ class AppBottomSheetFrame extends StatelessWidget {
                               constraints: BoxConstraints(
                                 maxHeight: bodyMaxHeight,
                               ),
-                              child: SingleChildScrollView(
-                                physics: const ClampingScrollPhysics(),
-                                child: hasSplitLayout ? resolvedBody : child,
-                              ),
+                              child:
+                                  bodyScrollable
+                                      ? SingleChildScrollView(
+                                        physics: const ClampingScrollPhysics(),
+                                        child:
+                                            hasSplitLayout
+                                                ? resolvedBody
+                                                : child,
+                                      )
+                                      : ClipRect(
+                                        child:
+                                            hasSplitLayout
+                                                ? resolvedBody
+                                                : child,
+                                      ),
                             ),
                           ),
                         ],

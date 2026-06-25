@@ -87,12 +87,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: AppPalette.of(context).surface,
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return AppBottomSheetFrame(
-          child: Column(
+          maxHeightFactor: 0.72,
+          header: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'QR со словами',
@@ -103,13 +103,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 'Сканируйте этот QR в настройках на другом устройстве, чтобы перенести общий список слов.',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const SizedBox(height: 16),
+            ],
+          ),
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
               PartyQrCodeCard(
                 code: payload,
                 caption: 'Этот QR переносит только пользовательские слова.',
               ),
             ],
           ),
+          child: const SizedBox.shrink(),
         );
       },
     );

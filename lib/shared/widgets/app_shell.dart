@@ -33,13 +33,9 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-      _scheduleDelayedReflow();
-    });
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _scheduleDelayedReflow(),
+    );
     app_reflow_signal.registerAppReflowSignal(_triggerReflow);
   }
 
@@ -62,11 +58,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
     }
     _reflowTimers
       ..clear()
-      ..addAll([
-        Timer(const Duration(milliseconds: 32), _triggerReflow),
-        Timer(const Duration(milliseconds: 180), _triggerReflow),
-        Timer(const Duration(milliseconds: 360), _triggerReflow),
-      ]);
+      ..add(Timer(const Duration(milliseconds: 120), _triggerReflow));
   }
 
   void _triggerReflow() {

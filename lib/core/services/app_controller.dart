@@ -38,6 +38,8 @@ class AppController extends ChangeNotifier {
   final BunkerRepository bunkerRepository;
   final AliasWordsRepository aliasRepository;
   final UiSoundService uiSoundService;
+  final ValueNotifier<AppThemePreference> themePreferenceListenable =
+      ValueNotifier(AppThemePreference.system);
 
   late final PartyRuntimeService runtime = PartyRuntimeService(
     codec: codec,
@@ -100,6 +102,7 @@ class AppController extends ChangeNotifier {
     _aliasSetupDraft = await storage.loadAliasSetupDraft();
     _lastParty = await storage.loadLastParty();
     _themePreference = await storage.loadThemePreference();
+    themePreferenceListenable.value = _themePreference;
     _uiSoundsEnabled = await storage.loadUiSoundsEnabled();
     _dirtyWordsEnabled = await storage.loadDirtyWordsEnabled();
     _customWords = await storage.loadCustomWords(GameType.spy);
@@ -156,6 +159,7 @@ class AppController extends ChangeNotifier {
 
   Future<void> updateThemePreference(AppThemePreference preference) async {
     _themePreference = preference;
+    themePreferenceListenable.value = preference;
     notifyListeners();
     await storage.saveThemePreference(preference);
   }
@@ -261,6 +265,7 @@ class AppController extends ChangeNotifier {
 
   @override
   void dispose() {
+    themePreferenceListenable.dispose();
     uiSoundService.dispose();
     super.dispose();
   }
