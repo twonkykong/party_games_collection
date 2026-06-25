@@ -5,6 +5,7 @@ import '../../../core/models/active_party.dart';
 import '../../../core/services/app_scope.dart';
 import '../../../core/services/ui_sound_service.dart';
 import '../../../shared/widgets/app_shell.dart';
+import '../../../shared/widgets/game_completion_sheet.dart';
 import '../../../shared/widgets/party_code_sheet.dart';
 import '../../../shared/widgets/reveal_card.dart';
 import '../../../shared/widgets/retry_state_card.dart';
@@ -21,9 +22,8 @@ class SpyGameScreen extends StatefulWidget {
 }
 
 class _SpyGameScreenState extends State<SpyGameScreen> {
-  bool _revealed = true;
+  bool _revealed = false;
   Future<SpyPartyState>? _partyFuture;
-  bool _starterShown = false;
 
   @override
   void didChangeDependencies() {
@@ -31,29 +31,6 @@ class _SpyGameScreenState extends State<SpyGameScreen> {
     _partyFuture ??= AppScope.of(
       context,
     ).runtime.buildSpyPartyFromCode(widget.activeParty.code);
-  }
-
-  void _showStarterOnce() {
-    if (_starterShown) {
-      return;
-    }
-    _starterShown = true;
-    final starter =
-        (widget.activeParty.configuration.seed.abs() %
-            widget.activeParty.configuration.playerCount) +
-        1;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Начинает игрок $starter'),
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    });
   }
 
   Future<void> _toggleReveal() async {
@@ -82,6 +59,13 @@ class _SpyGameScreenState extends State<SpyGameScreen> {
                       : null,
               icon: const Icon(Icons.key_rounded),
             ),
+            IconButton(
+              onPressed: () => showGameCompletionSheet(
+                context,
+                activeParty: widget.activeParty,
+              ),
+              icon: const Icon(Icons.flag_rounded),
+            ),
           ],
           child: switch (snapshot.connectionState) {
             ConnectionState.waiting => const Center(
@@ -96,15 +80,12 @@ class _SpyGameScreenState extends State<SpyGameScreen> {
                     ).runtime.buildSpyPartyFromCode(widget.activeParty.code);
                   }),
             ),
-            _ => () {
-              _showStarterOnce();
-              return _SpyGameContent(
-                activeParty: widget.activeParty,
-                state: snapshot.data!,
-                revealed: _revealed,
-                onToggle: _toggleReveal,
-              );
-            }(),
+            _ => _SpyGameContent(
+              activeParty: widget.activeParty,
+              state: snapshot.data!,
+              revealed: _revealed,
+              onToggle: _toggleReveal,
+            ),
           },
         );
       },
@@ -135,35 +116,54 @@ class _SpyGameContent extends StatelessWidget {
       children: [
         SectionCard(
           color: palette.surface,
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: isSpy ? palette.primarySoft : palette.secondarySoft,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Icon(
-                  isSpy ? Icons.visibility_off_rounded : Icons.groups_rounded,
-                  color: palette.primaryStrong,
-                ),
+              Row(
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: isSpy ? palette.primarySoft : palette.secondarySoft,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      isSpy ? Icons.visibility_off_rounded : Icons.groups_rounded,
+                      color: palette.primaryStrong,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Игрок ${activeParty.playerIndex}',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          isSpy ? 'Секретная роль' : 'Обычный игрок',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Игрок ${activeParty.playerIndex}',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      isSpy ? 'Секретная роль' : 'Обычный игрок',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: palette.surfaceMuted,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: palette.outline),
+                ),
+                child: Text(
+                  'Начинает игрок ${state.startingPlayerIndex}',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
             ],

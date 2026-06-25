@@ -4,6 +4,7 @@ import '../models/dictionary_mode.dart';
 import '../models/game_type.dart';
 import '../models/party_code_version.dart';
 import '../models/party_configuration.dart';
+import '../models/word_source_mode.dart';
 
 class PartyCodeCodec {
   const PartyCodeCodec();
@@ -13,6 +14,19 @@ class PartyCodeCodec {
   static const _base = 57;
   static const _legacyCodeLength = 11;
   static const aliasRoundSecondsOptions = [30, 45, 60, 75, 90, 120];
+  static const aliasTargetScoreOptions = [
+    10,
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    45,
+    50,
+    55,
+    60,
+  ];
 
   String encode(PartyConfiguration configuration) {
     if (configuration.version == PartyCodeVersion.v1) {
@@ -48,6 +62,16 @@ class PartyCodeCodec {
   int generateSeed() {
     final micros = DateTime.now().microsecondsSinceEpoch;
     return micros & 0xFFFFFFFFFFFF;
+  }
+
+  int generateNextSeed(String code, GameType gameType) {
+    var hash = 0x45D9F3B;
+    final input = '${gameType.code}::$code::next';
+    for (final codeUnit in input.codeUnits) {
+      hash = ((hash * 31) ^ codeUnit) & 0xFFFFFFFF;
+      hash = ((hash << 7) ^ (hash >> 3)) & 0xFFFFFFFF;
+    }
+    return hash & 0xFFFFFFFFFFFF;
   }
 
   String _encodeFixed(BigInt payload) {
@@ -148,6 +172,7 @@ class PartyCodeCodec {
         gameType: gameType,
         playerCount: players,
         dictionaryMode: dictionaryMode,
+        wordSourceMode: WordSourceMode.builtIn,
         seed: seed,
         spyCount: _decodeLegacyExtra(gameType, extra),
       );
@@ -169,26 +194,33 @@ class PartyCodeCodec {
       final version = PartyCodeVersion.fromValue(versionValue);
       final gameType = GameType.values[gameValue];
       final dictionaryMode = DictionaryMode.values[modeValue];
+      final wordSourceMode = _decodeV3WordSourceMode(gameType, extraA, extraB);
       return PartyConfiguration(
         version: version,
         gameType: gameType,
         playerCount: count,
         dictionaryMode: dictionaryMode,
+        wordSourceMode: wordSourceMode,
         seed: seed,
-        spyCount: gameType == GameType.spy ? extraA + 1 : null,
+        spyCount:
+            gameType == GameType.spy
+                ? (extraA & 0x7) + 1
+                : null,
         mafiaPresetId:
             gameType == GameType.mafia
                 ? (extraA == 1 ? 'expanded' : 'classic')
                 : null,
         aliasRoundSeconds:
             gameType == GameType.alias
-                ? aliasRoundSecondsOptions[extraA.clamp(
+                ? aliasRoundSecondsOptions[(extraA & 0x7).clamp(
                   0,
                   aliasRoundSecondsOptions.length - 1,
                 )]
                 : null,
         aliasTargetScore:
-            gameType == GameType.alias ? extraB.clamp(1, 63) : null,
+            gameType == GameType.alias
+                ? _decodeAliasTargetScore(extraB)
+                : null,
       );
     } catch (_) {
       return null;
@@ -222,7 +254,7 @@ class PartyCodeCodec {
   int _encodeV3ExtraA(PartyConfiguration configuration) {
     switch (configuration.gameType) {
       case GameType.spy:
-        return max(0, (configuration.spyCount ?? 1) - 1);
+        return max(0, (configuration.spyCount ?? 1) - 1) & 0xF;
       case GameType.whoAmI:
       case GameType.bunker:
         return 0;
@@ -230,20 +262,48 @@ class PartyCodeCodec {
         return configuration.mafiaPresetId == 'expanded' ? 1 : 0;
       case GameType.alias:
         final roundSeconds = configuration.aliasRoundSeconds ?? 60;
-        return aliasRoundSecondsOptions.indexOf(roundSeconds).clamp(0, 15);
+        return aliasRoundSecondsOptions.indexOf(roundSeconds).clamp(0, 7);
     }
   }
 
   int _encodeV3ExtraB(PartyConfiguration configuration) {
     switch (configuration.gameType) {
       case GameType.alias:
-        return (configuration.aliasTargetScore ?? 30).clamp(1, 63);
+        final sourceMode = _encodeV3WordSourceMode(configuration);
+        final targetScore = configuration.aliasTargetScore ?? 30;
+        final targetIndex = aliasTargetScoreOptions.indexOf(targetScore);
+        final normalizedTargetIndex =
+            targetIndex >= 0 ? targetIndex : aliasTargetScoreOptions.indexOf(30);
+        return ((sourceMode & 0x3) << 4) | (normalizedTargetIndex & 0xF);
       case GameType.spy:
       case GameType.whoAmI:
       case GameType.mafia:
       case GameType.bunker:
-        return 0;
+        return _encodeV3WordSourceMode(configuration);
     }
+  }
+
+  int _encodeV3WordSourceMode(PartyConfiguration configuration) {
+    return configuration.wordSourceMode.index & 0x3;
+  }
+
+  WordSourceMode _decodeV3WordSourceMode(
+    GameType gameType,
+    int extraA,
+    int extraB,
+  ) {
+    final modeIndex =
+        gameType == GameType.alias ? (extraB >> 4) & 0x3 : extraB & 0x3;
+    return WordSourceMode.values[
+      modeIndex.clamp(0, WordSourceMode.values.length - 1)
+    ];
+  }
+
+  int _decodeAliasTargetScore(int extraB) {
+    if (extraB > 15) {
+      return (extraB & 0x3F).clamp(1, 63);
+    }
+    return aliasTargetScoreOptions[extraB.clamp(0, aliasTargetScoreOptions.length - 1)];
   }
 }
 

@@ -13,6 +13,8 @@ dependencies:
   shared_preferences: ^2.5.3
   audioplayers: ^6.4.0
   web: ^1.1.1
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^7.1.1
 
 dev_dependencies:
   flutter_test:
@@ -25,7 +27,9 @@ flutter:
     - assets/data/alias_words_ultra.json
     - assets/data/bunker_ultra.json
     - assets/data/mafia_roles_ultra.json
+    - assets/data/people_lists_update.json
     - assets/data/spy_words_ultra.json
+    - assets/data/spy_hints_people_update.json
     - assets/data/whoami_words_ultra.json
     - assets/audio/ui/card_hide.wav
     - assets/audio/ui/card_reveal.wav

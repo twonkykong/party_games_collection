@@ -9,8 +9,10 @@ import '../models/active_party.dart';
 import '../models/app_theme_preference.dart';
 import '../models/dictionary_mode.dart';
 import '../models/game_setup_drafts.dart';
+import '../models/game_type.dart';
 import '../models/mafia_preset.dart';
 import '../models/saved_last_party.dart';
+import '../models/word_source_mode.dart';
 import 'local_storage_service.dart';
 import 'party_code_codec.dart';
 import 'party_runtime_service.dart';
@@ -44,16 +46,19 @@ class AppController extends ChangeNotifier {
     mafiaRepository: mafiaRepository,
     bunkerRepository: bunkerRepository,
     aliasRepository: aliasRepository,
+    storage: storage,
   );
 
   SpySetupDraft _spySetupDraft = const SpySetupDraft(
     playerCount: 5,
     spyCount: 1,
     dictionaryMode: DictionaryMode.family,
+    wordSourceMode: WordSourceMode.builtIn,
   );
   WhoAmISetupDraft _whoAmISetupDraft = const WhoAmISetupDraft(
     playerCount: 4,
     dictionaryMode: DictionaryMode.family,
+    wordSourceMode: WordSourceMode.builtIn,
   );
   MafiaSetupDraft _mafiaSetupDraft = const MafiaSetupDraft(
     playerCount: 6,
@@ -61,15 +66,17 @@ class AppController extends ChangeNotifier {
   );
   BunkerSetupDraft _bunkerSetupDraft = const BunkerSetupDraft(playerCount: 6);
   AliasSetupDraft _aliasSetupDraft = const AliasSetupDraft(
-    teamCount: 2,
+    teamCount: 1,
     roundSeconds: 60,
     targetScore: 30,
     dictionaryMode: DictionaryMode.family,
+    wordSourceMode: WordSourceMode.builtIn,
   );
   SavedLastParty? _lastParty;
   AppThemePreference _themePreference = AppThemePreference.system;
   bool _uiSoundsEnabled = true;
   bool _dirtyWordsEnabled = false;
+  List<String> _customWords = const [];
 
   SpySetupDraft get spySetupDraft => _spySetupDraft;
   WhoAmISetupDraft get whoAmISetupDraft => _whoAmISetupDraft;
@@ -80,6 +87,10 @@ class AppController extends ChangeNotifier {
   AppThemePreference get themePreference => _themePreference;
   bool get uiSoundsEnabled => _uiSoundsEnabled;
   bool get dirtyWordsEnabled => _dirtyWordsEnabled;
+  List<String> get customWords => _customWords;
+  List<String> get customSpyWords => _customWords;
+  List<String> get customWhoAmIWords => _customWords;
+  List<String> get customAliasWords => _customWords;
 
   Future<void> initialize() async {
     _spySetupDraft = await storage.loadSpySetupDraft();
@@ -91,6 +102,7 @@ class AppController extends ChangeNotifier {
     _themePreference = await storage.loadThemePreference();
     _uiSoundsEnabled = await storage.loadUiSoundsEnabled();
     _dirtyWordsEnabled = await storage.loadDirtyWordsEnabled();
+    _customWords = await storage.loadCustomWords(GameType.spy);
     uiSoundService.setEnabled(_uiSoundsEnabled);
     notifyListeners();
   }
@@ -159,6 +171,82 @@ class AppController extends ChangeNotifier {
     _dirtyWordsEnabled = enabled;
     notifyListeners();
     await storage.saveDirtyWordsEnabled(enabled);
+  }
+
+  List<String> customWordsFor(GameType gameType) {
+    switch (gameType) {
+      case GameType.spy:
+        return customWords;
+      case GameType.whoAmI:
+        return customWords;
+      case GameType.alias:
+        return customWords;
+      case GameType.mafia:
+      case GameType.bunker:
+        return const [];
+    }
+  }
+
+  Future<int> addSharedCustomWords(Iterable<String> rawWords) async {
+    return addCustomWords(GameType.spy, rawWords);
+  }
+
+  Future<int> addCustomWords(
+    GameType gameType,
+    Iterable<String> rawWords,
+  ) async {
+    final next = List<String>.from(customWordsFor(gameType));
+    final existingKeys = next.map((item) => item.toLowerCase()).toSet();
+    var added = 0;
+    for (final raw in rawWords) {
+      final normalized = raw.trim().replaceAll(RegExp(r'\s+'), ' ');
+      if (normalized.isEmpty) {
+        continue;
+      }
+      final key = normalized.toLowerCase();
+      if (existingKeys.contains(key)) {
+        continue;
+      }
+      next.add(normalized);
+      existingKeys.add(key);
+      added += 1;
+    }
+    await _saveCustomWords(gameType, next);
+    return added;
+  }
+
+  Future<void> removeCustomWord(GameType gameType, String word) async {
+    final next =
+        customWordsFor(
+          gameType,
+        ).where((item) => item.toLowerCase() != word.toLowerCase()).toList();
+    await _saveCustomWords(gameType, next);
+  }
+
+  Future<void> removeSharedCustomWord(String word) async {
+    await removeCustomWord(GameType.spy, word);
+  }
+
+  Future<void> clearCustomWords(GameType gameType) async {
+    await _saveCustomWords(gameType, const []);
+  }
+
+  Future<void> clearSharedCustomWords() async {
+    await clearCustomWords(GameType.spy);
+  }
+
+  Future<void> _saveCustomWords(GameType gameType, List<String> words) async {
+    switch (gameType) {
+      case GameType.spy:
+      case GameType.whoAmI:
+      case GameType.alias:
+        _customWords = words;
+      case GameType.mafia:
+      case GameType.bunker:
+        return;
+    }
+    notifyListeners();
+    await storage.saveCustomWords(gameType, words);
   }
 
   void playSound(UiSound sound) {

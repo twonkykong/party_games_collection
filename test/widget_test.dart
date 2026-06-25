@@ -5,6 +5,7 @@ import 'package:party_games_collection/core/models/game_type.dart';
 import 'package:party_games_collection/core/models/party_code_version.dart';
 import 'package:party_games_collection/core/models/party_configuration.dart';
 import 'package:party_games_collection/core/services/party_code_codec.dart';
+import 'package:party_games_collection/core/models/word_source_mode.dart';
 import 'package:party_games_collection/data/models/spy_word_entry.dart';
 import 'package:party_games_collection/data/models/whoami_word_entry.dart';
 import 'package:party_games_collection/features/games/spy/spy_party_state.dart';
@@ -18,6 +19,7 @@ void main() {
       gameType: GameType.spy,
       playerCount: 7,
       dictionaryMode: DictionaryMode.mixed,
+      wordSourceMode: WordSourceMode.builtIn,
       seed: 123456789,
       spyCount: 2,
     );
@@ -41,6 +43,7 @@ void main() {
       gameType: GameType.whoAmI,
       playerCount: 6,
       dictionaryMode: DictionaryMode.family,
+      wordSourceMode: WordSourceMode.builtIn,
       seed: 987654321,
     );
 
@@ -63,6 +66,7 @@ void main() {
       gameType: GameType.mafia,
       playerCount: 8,
       dictionaryMode: DictionaryMode.family,
+      wordSourceMode: WordSourceMode.builtIn,
       seed: 123456,
       mafiaPresetId: 'expanded',
     );
@@ -84,6 +88,7 @@ void main() {
       gameType: GameType.alias,
       playerCount: 3,
       dictionaryMode: DictionaryMode.family,
+      wordSourceMode: WordSourceMode.builtIn,
       seed: 654321,
       aliasRoundSeconds: 90,
       aliasTargetScore: 40,
@@ -159,5 +164,6 @@ void main() {
     expect(first.entry.word, second.entry.word);
     expect(first.hint, second.hint);
     expect(first.spyPlayerIndexes, second.spyPlayerIndexes);
+    expect(first.startingPlayerIndex, second.startingPlayerIndex);
   });
 }

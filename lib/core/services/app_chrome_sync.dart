@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -21,13 +23,16 @@ class AppChromeSync extends StatefulWidget {
   State<AppChromeSync> createState() => _AppChromeSyncState();
 }
 
-class _AppChromeSyncState extends State<AppChromeSync> {
+class _AppChromeSyncState extends State<AppChromeSync>
+    with WidgetsBindingObserver {
   Brightness? _lastBrightness;
   Color? _lastChromeColor;
+  final List<Timer> _syncTimers = <Timer>[];
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _scheduleSync();
   }
 
@@ -46,15 +51,37 @@ class _AppChromeSyncState extends State<AppChromeSync> {
     }
   }
 
-  void _scheduleSync() {
-    if (_lastBrightness == widget.brightness &&
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _scheduleSync(force: true);
+    }
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    _scheduleSync(force: true);
+  }
+
+  @override
+  void didChangeMetrics() {
+    _scheduleSync(force: true);
+  }
+
+  void _scheduleSync({bool force = false}) {
+    if (!force &&
+        _lastBrightness == widget.brightness &&
         _lastChromeColor == widget.chromeColor) {
       return;
     }
     _lastBrightness = widget.brightness;
     _lastChromeColor = widget.chromeColor;
+    for (final timer in _syncTimers) {
+      timer.cancel();
+    }
+    _syncTimers.clear();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    Future<void> runSync() async {
       if (!mounted) {
         return;
       }
@@ -69,11 +96,39 @@ class _AppChromeSyncState extends State<AppChromeSync> {
         brightness: widget.brightness,
         backgroundColor: widget.chromeColor,
       );
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(runSync());
     });
+
+    for (final delay in const [90, 240]) {
+      _syncTimers.add(
+        Timer(Duration(milliseconds: delay), () {
+          unawaited(runSync());
+        }),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final timer in _syncTimers) {
+      timer.cancel();
+    }
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.child;
+    final overlayStyle =
+        widget.brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: overlayStyle.copyWith(statusBarColor: Colors.transparent),
+      child: widget.child,
+    );
   }
 }

@@ -21,28 +21,27 @@
   <title>Сборник игр</title>
   <link rel="manifest" href="manifest.json">
 
-  <!-- 💣 FIX: убрать эластичность iOS -->
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
-
-      /* ❌ убираем bounce */
-      overflow: hidden;
-
-      /* ❌ запрещаем прокрутку-резинку */
-      overscroll-behavior: none;
-
-      /* ❌ iOS scroll chaining */
-      -webkit-overflow-scrolling: auto;
-
       background: #FFF7F0;
     }
 
-    /* Flutter canvas wrapper тоже фиксируем */
-    flutter-view, flt-glass-pane, flt-scene-host {
+    .platform-ios html,
+    .platform-ios body,
+    html.platform-ios,
+    body.platform-ios {
+      overflow: hidden;
+      overscroll-behavior: none;
+      -webkit-overflow-scrolling: auto;
+    }
+
+    .platform-ios flutter-view,
+    .platform-ios flt-glass-pane,
+    .platform-ios flt-scene-host {
       overscroll-behavior: none;
     }
   </style>
@@ -51,10 +50,18 @@
 <body>
   <script>
     (function () {
+      var userAgent = navigator.userAgent || '';
+      var isIOS = /iPhone|iPad|iPod/i.test(userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       var lightColor = '#FFF7F0';
       var darkColor = '#171211';
       var lightStatusBar = 'default';
       var darkStatusBar = 'black-translucent';
+
+      if (isIOS) {
+        document.documentElement.classList.add('platform-ios');
+        document.body.classList.add('platform-ios');
+      }
 
       function readThemePreference() {
         try {

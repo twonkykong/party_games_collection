@@ -10,6 +10,7 @@ import '../../core/models/game_setup_drafts.dart';
 import '../../core/models/game_type.dart';
 import '../../core/models/party_code_version.dart';
 import '../../core/models/party_configuration.dart';
+import '../../core/models/word_source_mode.dart';
 import '../../core/services/app_scope.dart';
 import '../../core/services/ui_sound_service.dart';
 import '../../shared/widgets/app_shell.dart';
@@ -18,6 +19,7 @@ import '../../shared/widgets/party_setup_code_card.dart';
 import '../../shared/widgets/primary_action_button.dart';
 import '../../shared/widgets/section_card.dart';
 import '../../shared/widgets/setting_stepper.dart';
+import '../../shared/widgets/word_source_mode_selector.dart';
 
 class SpySetupScreen extends StatefulWidget {
   const SpySetupScreen({super.key});
@@ -30,6 +32,7 @@ class _SpySetupScreenState extends State<SpySetupScreen> {
   late int _players;
   late int _spies;
   late DictionaryMode _mode;
+  late WordSourceMode _sourceMode;
   bool _initialized = false;
   int _selectedPlayerIndex = 1;
   String? _generatedCode;
@@ -46,6 +49,7 @@ class _SpySetupScreenState extends State<SpySetupScreen> {
     _players = draft.playerCount;
     _spies = draft.spyCount;
     _mode = draft.dictionaryMode;
+    _sourceMode = draft.wordSourceMode;
     _initialized = true;
   }
 
@@ -58,10 +62,11 @@ class _SpySetupScreenState extends State<SpySetupScreen> {
       _selectedPlayerIndex = 1;
     });
     final configuration = PartyConfiguration(
-      version: PartyCodeVersion.v2,
+      version: PartyCodeVersion.v3,
       gameType: GameType.spy,
       playerCount: _players,
       dictionaryMode: effectiveMode,
+      wordSourceMode: _sourceMode,
       seed: app.codec.generateSeed(),
       spyCount: _spies,
     );
@@ -72,6 +77,7 @@ class _SpySetupScreenState extends State<SpySetupScreen> {
         playerCount: _players,
         spyCount: _spies,
         dictionaryMode: effectiveMode,
+        wordSourceMode: _sourceMode,
       ),
     );
     app.playSound(UiSound.successSoft);
@@ -125,6 +131,9 @@ class _SpySetupScreenState extends State<SpySetupScreen> {
     final maxSpies = _players >= 6 ? 2 : 1;
     final palette = AppPalette.of(context);
     final dirtyWordsEnabled = AppScope.of(context).dirtyWordsEnabled;
+    final customWordsCount = AppScope.of(context).customSpyWords.length;
+    final requiresCustomWords =
+        _sourceMode == WordSourceMode.customOnly && customWordsCount == 0;
     if (_spies > maxSpies) {
       _spies = maxSpies;
     }
@@ -172,7 +181,37 @@ class _SpySetupScreenState extends State<SpySetupScreen> {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  'Подбор слов',
+                  'Источник слов',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 12),
+                WordSourceModeSelector(
+                  value: _sourceMode,
+                  onChanged: (value) {
+                    AppScope.of(context).playSound(UiSound.toggleSoft);
+                    setState(() => _sourceMode = value);
+                  },
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  customWordsCount == 0
+                      ? 'Пользовательских слов для Шпиона пока нет.'
+                      : 'Пользовательских слов для Шпиона: $customWordsCount',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                if (requiresCustomWords) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'Для режима "Только свои" сначала добавьте слова в настройках.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: palette.errorStrong,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 18),
+                Text(
+                  'Режим встроенных слов',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 12),
@@ -195,13 +234,14 @@ class _SpySetupScreenState extends State<SpySetupScreen> {
           const SizedBox(height: 18),
           PrimaryActionButton(
             label: _isGenerating ? 'Генерируем...' : 'Создать код партии',
-            onPressed: _isGenerating ? null : _generate,
+            onPressed: _isGenerating || requiresCustomWords ? null : _generate,
           ),
           if (_isGenerating || _generatedCode != null) ...[
             const SizedBox(height: 24),
             PartySetupCodeCard(
               palette: palette,
               code: _isGenerating ? _animatedCode : _generatedCode!,
+              showQr: !_isGenerating && _generatedCode != null,
               selectedIndex: _selectedPlayerIndex,
               itemCount: _players,
               onChanged:

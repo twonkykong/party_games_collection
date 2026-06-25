@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+import '../../core/services/app_reflow_signal_stub.dart'
+    if (dart.library.html) '../../core/services/app_reflow_signal_web.dart'
+    as app_reflow_signal;
 
 import '../../app/app_palette.dart';
 
-class AppShell extends StatelessWidget {
+class AppShell extends StatefulWidget {
   const AppShell({
     required this.child,
     super.key,
@@ -17,19 +23,79 @@ class AppShell extends StatelessWidget {
   final Widget? leading;
 
   @override
+  State<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
+  final List<Timer> _reflowTimers = <Timer>[];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+      _scheduleDelayedReflow();
+    });
+    app_reflow_signal.registerAppReflowSignal(_triggerReflow);
+  }
+
+  @override
+  void didChangeMetrics() {
+    _triggerReflow();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _triggerReflow();
+      _scheduleDelayedReflow();
+    }
+  }
+
+  void _scheduleDelayedReflow() {
+    for (final timer in _reflowTimers) {
+      timer.cancel();
+    }
+    _reflowTimers
+      ..clear()
+      ..addAll([
+        Timer(const Duration(milliseconds: 32), _triggerReflow),
+        Timer(const Duration(milliseconds: 180), _triggerReflow),
+        Timer(const Duration(milliseconds: 360), _triggerReflow),
+      ]);
+  }
+
+  void _triggerReflow() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    for (final timer in _reflowTimers) {
+      timer.cancel();
+    }
+    WidgetsBinding.instance.removeObserver(this);
+    app_reflow_signal.unregisterAppReflowSignal();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final palette = AppPalette.of(context);
+    final mediaQuery = MediaQuery.of(context);
+    final topInset = mediaQuery.padding.top;
+    final bottomInset = mediaQuery.padding.bottom;
+    final hasHeader = widget.title != null;
 
     return Scaffold(
-      appBar:
-          title == null
-              ? null
-              : AppBar(
-                title: Text(title!),
-                centerTitle: false,
-                leading: leading,
-                actions: actions,
-              ),
+      backgroundColor: palette.backgroundTop,
       body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -74,14 +140,64 @@ class AppShell extends StatelessWidget {
                 ),
               ),
             ),
-            SafeArea(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 560),
-                  child: child,
+            Column(
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 140),
+                  curve: Curves.easeOutCubic,
+                  height: topInset,
+                  color: palette.backgroundTop,
                 ),
-              ),
+                if (hasHeader)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 560),
+                      child: SizedBox(
+                        height: 52,
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 48,
+                              child:
+                                  widget.leading ??
+                                  BackButton(color: palette.textPrimary),
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                widget.title!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style:
+                                    Theme.of(
+                                      context,
+                                    ).appBarTheme.titleTextStyle,
+                              ),
+                            ),
+                            if (widget.actions != null) ...widget.actions!,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                Expanded(
+                  child: SafeArea(
+                    top: false,
+                    left: true,
+                    right: true,
+                    bottom: true,
+                    minimum: EdgeInsets.only(bottom: bottomInset > 0 ? 0 : 8),
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 560),
+                        child: widget.child,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

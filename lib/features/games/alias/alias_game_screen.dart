@@ -7,6 +7,7 @@ import '../../../core/models/active_party.dart';
 import '../../../core/services/app_scope.dart';
 import '../../../core/services/ui_sound_service.dart';
 import '../../../shared/widgets/app_shell.dart';
+import '../../../shared/widgets/game_completion_sheet.dart';
 import '../../../shared/widgets/party_code_sheet.dart';
 import '../../../shared/widgets/primary_action_button.dart';
 import '../../../shared/widgets/retry_state_card.dart';
@@ -179,6 +180,13 @@ class _AliasGameScreenState extends State<AliasGameScreen> {
                       )
                       : null,
               icon: const Icon(Icons.key_rounded),
+            ),
+            IconButton(
+              onPressed: () => showGameCompletionSheet(
+                context,
+                activeParty: widget.activeParty,
+              ),
+              icon: const Icon(Icons.flag_rounded),
             ),
           ],
           child: switch (snapshot.connectionState) {

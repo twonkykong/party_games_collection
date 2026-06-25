@@ -10,6 +10,7 @@ import '../../core/services/game_registry.dart';
 import '../../core/services/ui_sound_service.dart';
 import '../../shared/widgets/app_shell.dart';
 import '../../shared/widgets/labeled_value_row.dart';
+import '../../shared/widgets/party_qr_scan_sheet.dart';
 import '../../shared/widgets/party_setup_code_card.dart';
 import '../../shared/widgets/primary_action_button.dart';
 import '../../shared/widgets/section_card.dart';
@@ -33,6 +34,17 @@ class _JoinPartyScreenState extends State<JoinPartyScreen> {
     super.dispose();
   }
 
+  String _formatError(Object error) {
+    final raw = '$error'.trim();
+    const prefixes = ['Exception: ', 'StateError: ', 'Bad state: '];
+    for (final prefix in prefixes) {
+      if (raw.startsWith(prefix)) {
+        return raw.substring(prefix.length).trim();
+      }
+    }
+    return raw;
+  }
+
   Future<void> _parseCode() async {
     final app = AppScope.of(context);
     try {
@@ -50,7 +62,7 @@ class _JoinPartyScreenState extends State<JoinPartyScreen> {
       app.playSound(UiSound.errorSoft);
       setState(() {
         _candidate = null;
-        _error = '$error';
+        _error = _formatError(error);
       });
     }
   }
@@ -153,6 +165,21 @@ class _JoinPartyScreenState extends State<JoinPartyScreen> {
               ),
             ],
           ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: () async {
+              final app = AppScope.of(context);
+              app.playSound(UiSound.tapSoft);
+              final code = await showPartyQrScannerSheet(context);
+              if (!mounted || code == null || code.isEmpty) {
+                return;
+              }
+              _controller.text = code;
+              await _parseCode();
+            },
+            icon: const Icon(Icons.qr_code_scanner_rounded),
+            label: const Text('Сканировать QR'),
+          ),
           if (_error != null) ...[
             const SizedBox(height: 12),
             SectionCard(
@@ -203,6 +230,15 @@ class _JoinPartyScreenState extends State<JoinPartyScreen> {
                     label: 'Режим',
                     value: candidate.configuration.dictionaryMode.label,
                   ),
+                  if (candidate.gameType == GameType.spy ||
+                      candidate.gameType == GameType.whoAmI ||
+                      candidate.gameType == GameType.alias) ...[
+                    const SizedBox(height: 10),
+                    LabeledValueRow(
+                      label: 'Источник',
+                      value: candidate.configuration.wordSourceMode.label,
+                    ),
+                  ],
                   if (candidate.gameType == GameType.spy) ...[
                     const SizedBox(height: 10),
                     LabeledValueRow(

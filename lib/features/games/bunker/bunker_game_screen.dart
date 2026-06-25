@@ -6,12 +6,13 @@ import '../../../core/services/app_scope.dart';
 import '../../../core/services/ui_sound_service.dart';
 import '../../../data/models/bunker_catalog.dart';
 import '../../../shared/widgets/app_shell.dart';
+import '../../../shared/widgets/game_completion_sheet.dart';
 import '../../../shared/widgets/party_code_sheet.dart';
 import '../../../shared/widgets/retry_state_card.dart';
 import '../../../shared/widgets/section_card.dart';
 import 'bunker_party_state.dart';
 
-enum BunkerViewMode { personal, overview, flow, finale }
+enum BunkerViewMode { personal, players, bunker, flow, finale }
 
 class BunkerGameScreen extends StatefulWidget {
   const BunkerGameScreen({required this.activeParty, super.key});
@@ -61,9 +62,7 @@ class _BunkerGameScreenState extends State<BunkerGameScreen> {
   }
 
   Set<String> _parseStringSet(Object? raw) {
-    return (raw as List<dynamic>? ?? const [])
-        .whereType<String>()
-        .toSet();
+    return (raw as List<dynamic>? ?? const []).whereType<String>().toSet();
   }
 
   Set<int> _parseIntSet(Object? raw) {
@@ -157,6 +156,14 @@ class _BunkerGameScreenState extends State<BunkerGameScreen> {
                       )
                       : null,
               icon: const Icon(Icons.key_rounded),
+            ),
+            IconButton(
+              onPressed:
+                  () => showGameCompletionSheet(
+                    context,
+                    activeParty: widget.activeParty,
+                  ),
+              icon: const Icon(Icons.flag_rounded),
             ),
           ],
           child: switch (snapshot.connectionState) {
@@ -298,45 +305,11 @@ class _BunkerGameContent extends StatelessWidget {
                   );
                 },
               ),
-              const SizedBox(height: 10),
-              Text(
-                state.disaster,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(
-                  context,
-                ).textTheme.headlineMedium?.copyWith(fontSize: 28),
-              ),
-              const SizedBox(height: 8),
-              Text('${state.location} • ${state.capacity}'),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children:
-                    state.globalConditions
-                        .map(
-                          (condition) => Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: palette.surfaceMuted,
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: Text(condition),
-                          ),
-                        )
-                        .toList(),
-              ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               _BunkerTabs(mode: mode, onModeChanged: onModeChanged),
             ],
           ),
         ),
-        const SizedBox(height: 18),
-        _BunkerIntroCard(state: state),
         const SizedBox(height: 18),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 260),
@@ -351,7 +324,7 @@ class _BunkerGameContent extends StatelessWidget {
                       markedFields: personalMarkedFields,
                       onToggleMark: onTogglePersonalMark,
                     )
-                    : mode == BunkerViewMode.overview
+                    : mode == BunkerViewMode.players
                     ? _OverviewView(
                       players: state.players,
                       eliminatedPlayers: eliminatedPlayers,
@@ -359,6 +332,8 @@ class _BunkerGameContent extends StatelessWidget {
                       onToggleEliminated: onToggleEliminated,
                       isRevealed: _isRevealed,
                     )
+                    : mode == BunkerViewMode.bunker
+                    ? _BunkerLoreView(state: state)
                     : mode == BunkerViewMode.flow
                     ? _FlowView(rounds: state.rounds)
                     : _FinaleView(
@@ -487,6 +462,8 @@ class _PersonalFieldCard extends StatelessWidget {
       },
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
+        splashFactory: NoSplash.splashFactory,
+        overlayColor: const WidgetStatePropertyAll(Colors.transparent),
         onTap: onTap,
         child: SectionCard(
           color: palette.surface,
@@ -545,6 +522,13 @@ class _OverviewView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Text('Игроки', style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: 8),
+        Text(
+          'Профессия видна сразу, остальные карточки раскрываются внутри блока по мере игры.',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 16),
         for (var index = 0; index < playerEntries.length; index++) ...[
           _OverviewPlayerCard(
             playerIndex: playerEntries[index].key,
@@ -602,66 +586,58 @@ class _OverviewPlayerCard extends StatelessWidget {
         opacity: eliminated ? 0.55 : 1,
         child: SectionCard(
           color: palette.surface,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final compact = constraints.maxWidth < 390;
-                  final button = FilledButton.tonal(
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              dividerColor: Colors.transparent,
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              hoverColor: Colors.transparent,
+            ),
+            child: ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: EdgeInsets.zero,
+              shape: const Border(),
+              collapsedShape: const Border(),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Игрок $playerIndex',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 10),
+                  _BunkerInfoCardSurface(
+                    title: 'Профессия',
+                    lines: [profile.profession],
+                    emphasis: true,
+                  ),
+                ],
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: FilledButton.tonal(
                     onPressed: () => onToggleEliminated(playerIndex),
                     child: Text(eliminated ? 'Вернуть' : 'Выгнать'),
-                  );
-
-                  if (compact) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Игрок $playerIndex',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(width: double.infinity, child: button),
-                      ],
-                    );
-                  }
-
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Игрок $playerIndex',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      button,
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 14),
-              _BunkerInfoCardSurface(
-                title: 'Профессия',
-                lines: [profile.profession],
-                emphasis: true,
-              ),
-              const SizedBox(height: 14),
-              for (final item in entries) ...[
-                _RevealFieldCard(
-                  label: item.$1,
-                  lines: item.$2,
-                  revealed: isRevealed(playerIndex, item.$1),
-                  onTap: () => onToggleRevealField(playerIndex, item.$1),
+                  ),
                 ),
-                if (item != entries.last) const SizedBox(height: 10),
+              ),
+              children: [
+                const SizedBox(height: 14),
+                for (final item in entries) ...[
+                  _RevealFieldCard(
+                    label: item.$1,
+                    lines: item.$2,
+                    revealed: isRevealed(playerIndex, item.$1),
+                    onTap: () => onToggleRevealField(playerIndex, item.$1),
+                  ),
+                  if (item != entries.last) const SizedBox(height: 10),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -760,6 +736,88 @@ class _FlowView extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _BunkerLoreView extends StatelessWidget {
+  const _BunkerLoreView({required this.state});
+
+  final BunkerPartyState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = AppPalette.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionCard(
+          color: palette.surface,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Бункер', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 10),
+              Text(
+                state.disaster,
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineMedium?.copyWith(fontSize: 28),
+              ),
+              const SizedBox(height: 16),
+              _BunkerInfoCardSurface(
+                title: state.introLore.title,
+                lines: [state.introLore.summary, state.introLore.details],
+              ),
+              const SizedBox(height: 14),
+              _BunkerInfoCardSurface(title: 'Место', lines: [state.location]),
+              const SizedBox(height: 12),
+              _BunkerInfoCardSurface(
+                title: 'Вместимость',
+                lines: [state.capacity],
+              ),
+              const SizedBox(height: 12),
+              _BunkerInfoCardSurface(
+                title: 'Срок выживания',
+                lines: [state.survivalTerm],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        SectionCard(
+          color: palette.surfaceMuted,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Условия', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children:
+                    state.globalConditions
+                        .map(
+                          (condition) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: palette.surface,
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(color: palette.outline),
+                            ),
+                            child: Text(condition),
+                          ),
+                        )
+                        .toList(),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -951,6 +1009,8 @@ class _RevealFieldCard extends StatelessWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(18),
+      splashFactory: NoSplash.splashFactory,
+      overlayColor: const WidgetStatePropertyAll(Colors.transparent),
       onTap: onTap,
       child: AnimatedContainer(
         duration: Duration(milliseconds: revealed ? 220 : 70),
@@ -1382,7 +1442,8 @@ class _BunkerTabs extends StatelessWidget {
     final palette = AppPalette.of(context);
     const items = [
       (BunkerViewMode.personal, 'Личное'),
-      (BunkerViewMode.overview, 'Обзор'),
+      (BunkerViewMode.players, 'Игроки'),
+      (BunkerViewMode.bunker, 'Бункер'),
       (BunkerViewMode.flow, 'Ход'),
       (BunkerViewMode.finale, 'Финал'),
     ];

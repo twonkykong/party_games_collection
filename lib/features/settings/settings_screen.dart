@@ -7,8 +7,50 @@ import '../../core/services/ui_sound_service.dart';
 import '../../shared/widgets/app_shell.dart';
 import '../../shared/widgets/section_card.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  final TextEditingController _controller = TextEditingController();
+  String? _successMessage;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  List<String> _parseWords(String raw) {
+    return raw
+        .split(',')
+        .map((item) => item.trim().replaceAll(RegExp(r'\s+'), ' '))
+        .where((item) => item.isNotEmpty)
+        .toList(growable: false);
+  }
+
+  Future<void> _addWords() async {
+    final app = AppScope.of(context);
+    final parsed = _parseWords(_controller.text);
+    if (parsed.isEmpty) {
+      return;
+    }
+    final added = await app.addSharedCustomWords(parsed);
+    if (!mounted) {
+      return;
+    }
+    _controller.clear();
+    setState(() {
+      _successMessage =
+          added > 0
+              ? (added == 1 ? 'Слово добавлено.' : 'Добавлено слов: $added.')
+              : 'Новых слов не было: дубликаты уже существуют.';
+    });
+    app.playSound(added > 0 ? UiSound.successSoft : UiSound.errorSoft);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +116,7 @@ class SettingsScreen extends StatelessWidget {
               activeColor: palette.primary,
               title: const Text('Грязные слова'),
               subtitle: const Text(
-                'Показывать взрослые режимы словаря в играх со словами',
+                'Показывать взрослые режимы встроенных словарей в играх со словами',
               ),
               onChanged: (value) async {
                 await controller.setDirtyWordsEnabled(value);
@@ -102,12 +144,159 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
+            'Пользовательские слова',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Эти списки хранятся локально на этом устройстве и подключаются в выбранных играх через источник слов.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 16),
+          _CustomWordsSection(
+            inputController: _controller,
+            words: controller.customWords,
+            successMessage: _successMessage,
+            onChanged: () => setState(() {}),
+            onAdd: _addWords,
+            onRemove: (word) async {
+              await controller.removeSharedCustomWord(word);
+              if (!mounted) {
+                return;
+              }
+              setState(() {
+                _successMessage = null;
+              });
+              controller.playSound(UiSound.toggleSoft);
+            },
+            onClear: () async {
+              await controller.clearSharedCustomWords();
+              if (!mounted) {
+                return;
+              }
+              setState(() {
+                _successMessage = null;
+              });
+              controller.playSound(UiSound.toggleSoft);
+            },
+          ),
+          const SizedBox(height: 16),
+          Text(
             'by twonkykong',
             textAlign: TextAlign.center,
             style: Theme.of(
               context,
             ).textTheme.bodySmall?.copyWith(color: palette.textSecondary),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CustomWordsSection extends StatelessWidget {
+  const _CustomWordsSection({
+    required this.inputController,
+    required this.words,
+    required this.successMessage,
+    required this.onChanged,
+    required this.onAdd,
+    required this.onRemove,
+    required this.onClear,
+  });
+
+  final TextEditingController inputController;
+  final List<String> words;
+  final String? successMessage;
+  final VoidCallback onChanged;
+  final Future<void> Function() onAdd;
+  final Future<void> Function(String word) onRemove;
+  final Future<void> Function() onClear;
+
+  List<String> _previewWords() {
+    return inputController.text
+        .split(',')
+        .map((item) => item.trim().replaceAll(RegExp(r'\s+'), ' '))
+        .where((item) => item.isNotEmpty)
+        .toList(growable: false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = AppPalette.of(context);
+    final preview = _previewWords();
+    final addLabel =
+        preview.length <= 1
+            ? 'Добавить слово'
+            : 'Добавить слова (${preview.length})';
+
+    return SectionCard(
+      color: palette.surface,
+      padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Общие пользовательские слова',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Один общий список используется в "Кто я", "Элиасе" и "Шпионе". Можно ввести одно слово или несколько через запятую.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 14),
+          TextField(
+            controller: inputController,
+            minLines: 1,
+            maxLines: 3,
+            onChanged: (_) => onChanged(),
+            decoration: const InputDecoration(
+              hintText: 'Например: Человек-паук, Майкл Джексон, перекур',
+            ),
+          ),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: preview.isEmpty ? null : onAdd,
+            child: Text(addLabel),
+          ),
+          if (successMessage != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: palette.success.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                successMessage!,
+                style: TextStyle(
+                  color: palette.success,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
+          if (words.isEmpty)
+            Text('Пока пусто.', style: Theme.of(context).textTheme.bodyMedium)
+          else ...[
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: words
+                  .map(
+                    (word) => Chip(
+                      label: Text(word),
+                      onDeleted: () => onRemove(word),
+                    ),
+                  )
+                  .toList(growable: false),
+            ),
+            const SizedBox(height: 12),
+            TextButton(onPressed: onClear, child: const Text('Очистить все')),
+          ],
         ],
       ),
     );

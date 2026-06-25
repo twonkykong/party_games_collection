@@ -1,8 +1,11 @@
 import '../../data/repositories/alias_words_repository.dart';
+import '../../data/models/alias_word_entry.dart';
 import '../../data/models/bunker_catalog.dart';
 import '../../data/repositories/bunker_repository.dart';
 import '../../data/repositories/mafia_repository.dart';
+import '../../data/models/spy_word_entry.dart';
 import '../../data/repositories/spy_words_repository.dart';
+import '../../data/models/whoami_word_entry.dart';
 import '../../data/repositories/whoami_words_repository.dart';
 import '../../features/games/alias/alias_party_state.dart';
 import '../../features/games/bunker/bunker_party_state.dart';
@@ -12,7 +15,9 @@ import '../../features/games/whoami/whoami_party_state.dart';
 import '../models/active_party.dart';
 import '../models/game_type.dart';
 import '../models/party_configuration.dart';
+import '../models/word_source_mode.dart';
 import 'deterministic_random.dart';
+import 'local_storage_service.dart';
 import 'party_code_codec.dart';
 
 class PartyRuntimeService {
@@ -23,6 +28,7 @@ class PartyRuntimeService {
     required this.mafiaRepository,
     required this.bunkerRepository,
     required this.aliasRepository,
+    required this.storage,
   });
 
   final PartyCodeCodec codec;
@@ -31,6 +37,7 @@ class PartyRuntimeService {
   final MafiaRepository mafiaRepository;
   final BunkerRepository bunkerRepository;
   final AliasWordsRepository aliasRepository;
+  final LocalStorageService storage;
 
   PartyConfiguration previewFromCode(String code) {
     return codec.decode(code.trim());
@@ -58,8 +65,13 @@ class PartyRuntimeService {
       throw const PartyCodeException('Код относится к другой игре.');
     }
     final entries = await spyRepository.load(configuration.dictionaryMode);
+    final customWords = await storage.loadCustomWords(GameType.spy);
     return resolveSpyParty(
-      entries: entries,
+      entries: _resolveSpyEntries(
+        builtInEntries: entries,
+        customWords: customWords,
+        sourceMode: configuration.wordSourceMode,
+      ),
       seed: configuration.seed,
       playerCount: configuration.playerCount,
       spyCount: configuration.spyCount ?? 1,
@@ -72,8 +84,13 @@ class PartyRuntimeService {
       throw const PartyCodeException('Код относится к другой игре.');
     }
     final entries = await whoAmIRepository.load(configuration.dictionaryMode);
+    final customWords = await storage.loadCustomWords(GameType.whoAmI);
     return resolveWhoAmIParty(
-      entries: entries,
+      entries: _resolveWhoAmIEntries(
+        builtInEntries: entries,
+        customWords: customWords,
+        sourceMode: configuration.wordSourceMode,
+      ),
       seed: configuration.seed,
       playerCount: configuration.playerCount,
     );
@@ -147,7 +164,9 @@ class PartyRuntimeService {
             ? catalog.roundProgressions.values.first
             : const <BunkerRoundStep>[]);
     if (rounds.isEmpty) {
-      throw const PartyCodeException('Для этого числа игроков нет сценария Бункера.');
+      throw const PartyCodeException(
+        'Для этого числа игроков нет сценария Бункера.',
+      );
     }
     final introLore = random.shuffled(catalog.introLore);
     final professions = random.shuffled(catalog.professions);
@@ -205,14 +224,130 @@ class PartyRuntimeService {
       throw const PartyCodeException('Код относится к другой игре.');
     }
     final words = await aliasRepository.load(configuration.dictionaryMode);
+    final customWords = await storage.loadCustomWords(GameType.alias);
+    final sourceWords = _resolveAliasEntries(
+      builtInEntries: words,
+      customWords: customWords,
+      sourceMode: configuration.wordSourceMode,
+    );
     final random = DeterministicRandom(configuration.seed);
     final deck =
-        random.shuffled(words).map((entry) => entry.value).take(120).toList();
+        random
+            .shuffled(sourceWords)
+            .map((entry) => entry.value)
+            .take(120)
+            .toList();
     return AliasPartyState(
       words: deck,
       teamCount: configuration.playerCount,
       roundSeconds: configuration.aliasRoundSeconds ?? 60,
       targetScore: configuration.aliasTargetScore ?? 30,
     );
+  }
+
+  List<SpyWordEntry> _resolveSpyEntries({
+    required List<SpyWordEntry> builtInEntries,
+    required List<String> customWords,
+    required WordSourceMode sourceMode,
+  }) {
+    final customEntries = customWords
+        .map(
+          (word) => SpyWordEntry(
+            word: word,
+            hints: _fallbackSpyHints(word),
+            rating: 'family',
+          ),
+        )
+        .toList(growable: false);
+    return _mergeWordSources(
+      builtIn: builtInEntries,
+      custom: customEntries,
+      sourceMode: sourceMode,
+      emptyMessage: 'Для выбранного источника словарь Шпиона пуст.',
+      keyOf: (entry) => entry.word,
+    );
+  }
+
+  List<WhoAmIWordEntry> _resolveWhoAmIEntries({
+    required List<WhoAmIWordEntry> builtInEntries,
+    required List<String> customWords,
+    required WordSourceMode sourceMode,
+  }) {
+    final customEntries = customWords
+        .map((word) => WhoAmIWordEntry(value: word, rating: 'family'))
+        .toList(growable: false);
+    return _mergeWordSources(
+      builtIn: builtInEntries,
+      custom: customEntries,
+      sourceMode: sourceMode,
+      emptyMessage: 'Для выбранного источника словарь "Кто я" пуст.',
+      keyOf: (entry) => entry.value,
+    );
+  }
+
+  List<AliasWordEntry> _resolveAliasEntries({
+    required List<AliasWordEntry> builtInEntries,
+    required List<String> customWords,
+    required WordSourceMode sourceMode,
+  }) {
+    final customEntries = customWords
+        .map((word) => AliasWordEntry(value: word, rating: 'family'))
+        .toList(growable: false);
+    return _mergeWordSources(
+      builtIn: builtInEntries,
+      custom: customEntries,
+      sourceMode: sourceMode,
+      emptyMessage: 'Для выбранного источника словарь Элиаса пуст.',
+      keyOf: (entry) => entry.value,
+    );
+  }
+
+  List<T> _mergeWordSources<T>({
+    required List<T> builtIn,
+    required List<T> custom,
+    required WordSourceMode sourceMode,
+    required String emptyMessage,
+    required String Function(T item) keyOf,
+  }) {
+    final merged = switch (sourceMode) {
+      WordSourceMode.builtIn => builtIn,
+      WordSourceMode.mixed => [...builtIn, ...custom],
+      WordSourceMode.customOnly => custom,
+    };
+    final seen = <String>{};
+    final result =
+        merged
+            .where((item) => seen.add(keyOf(item).trim().toLowerCase()))
+            .toList();
+    if (result.isEmpty) {
+      throw StateError(emptyMessage);
+    }
+    return result;
+  }
+
+  List<String> _fallbackSpyHints(String word) {
+    final normalized = word.trim();
+    if (normalized.isEmpty) {
+      return const ['контекст', 'ассоциация', 'сцена'];
+    }
+    if (RegExp(r'^[А-ЯA-Z][^ ]+[ -][А-ЯA-Z]').hasMatch(normalized)) {
+      return const ['медиа', 'образ', 'узнаваемость', 'ассоциация', 'персона'];
+    }
+    if (normalized.contains(' ')) {
+      return const ['сцена', 'контекст', 'ассоциация', 'образ', 'деталь'];
+    }
+    final lower = normalized.toLowerCase();
+    if (lower.contains('клуб') ||
+        lower.contains('бар') ||
+        lower.contains('сигар') ||
+        lower.contains('виски')) {
+      return const ['вечер', 'компания', 'жест', 'атмосфера', 'привычка'];
+    }
+    if (lower.contains('телефон') ||
+        lower.contains('айфон') ||
+        lower.contains('ноутбук')) {
+      return const ['экран', 'зарядка', 'жест', 'карман', 'техника'];
+    }
+    return const ['контекст', 'деталь', 'ассоциация', 'жест', 'сцена'];
   }
 }

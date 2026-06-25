@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/app_palette.dart';
 import '../../core/services/app_scope.dart';
 import '../../core/services/ui_sound_service.dart';
+import 'party_qr_code_card.dart';
 import 'primary_action_button.dart';
 import 'section_card.dart';
 import 'wheel_index_picker.dart';
@@ -20,6 +21,7 @@ class PartySetupCodeCard extends StatelessWidget {
     this.indexLabel = 'Ваш индекс игрока',
     this.startLabel = 'Начать игру',
     this.selectorLabelBuilder,
+    this.showQr = true,
   });
 
   final AppPalette palette;
@@ -32,6 +34,7 @@ class PartySetupCodeCard extends StatelessWidget {
   final String indexLabel;
   final String startLabel;
   final String Function(int value)? selectorLabelBuilder;
+  final bool showQr;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +62,10 @@ class PartySetupCodeCard extends StatelessWidget {
               ),
             ),
           ),
+          if (showQr) ...[
+            const SizedBox(height: 16),
+            PartyQrCodeCard(code: code),
+          ],
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: onCopy,

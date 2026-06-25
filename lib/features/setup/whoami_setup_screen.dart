@@ -8,6 +8,7 @@ import '../../core/models/game_setup_drafts.dart';
 import '../../core/models/game_type.dart';
 import '../../core/models/party_code_version.dart';
 import '../../core/models/party_configuration.dart';
+import '../../core/models/word_source_mode.dart';
 import '../../core/services/app_scope.dart';
 import '../../core/services/ui_sound_service.dart';
 import '../../shared/widgets/app_shell.dart';
@@ -16,6 +17,7 @@ import '../../shared/widgets/party_setup_code_card.dart';
 import '../../shared/widgets/primary_action_button.dart';
 import '../../shared/widgets/section_card.dart';
 import '../../shared/widgets/setting_stepper.dart';
+import '../../shared/widgets/word_source_mode_selector.dart';
 
 class WhoAmISetupScreen extends StatefulWidget {
   const WhoAmISetupScreen({super.key});
@@ -27,6 +29,7 @@ class WhoAmISetupScreen extends StatefulWidget {
 class _WhoAmISetupScreenState extends State<WhoAmISetupScreen> {
   late int _players;
   late DictionaryMode _mode;
+  late WordSourceMode _sourceMode;
   int _selectedPlayerIndex = 1;
   String? _generatedCode;
   bool _isGenerating = false;
@@ -42,6 +45,7 @@ class _WhoAmISetupScreenState extends State<WhoAmISetupScreen> {
     final draft = AppScope.of(context).whoAmISetupDraft;
     _players = draft.playerCount;
     _mode = draft.dictionaryMode;
+    _sourceMode = draft.wordSourceMode;
     _initialized = true;
   }
 
@@ -54,16 +58,21 @@ class _WhoAmISetupScreenState extends State<WhoAmISetupScreen> {
       _selectedPlayerIndex = 1;
     });
     final configuration = PartyConfiguration(
-      version: PartyCodeVersion.v2,
+      version: PartyCodeVersion.v3,
       gameType: GameType.whoAmI,
       playerCount: _players,
       dictionaryMode: effectiveMode,
+      wordSourceMode: _sourceMode,
       seed: app.codec.generateSeed(),
     );
     final code = app.codec.encode(configuration);
     await _runCodeAnimation(code);
     await app.updateWhoAmISetupDraft(
-      WhoAmISetupDraft(playerCount: _players, dictionaryMode: effectiveMode),
+      WhoAmISetupDraft(
+        playerCount: _players,
+        dictionaryMode: effectiveMode,
+        wordSourceMode: _sourceMode,
+      ),
     );
     app.playSound(UiSound.successSoft);
     if (!mounted) {
@@ -115,6 +124,9 @@ class _WhoAmISetupScreenState extends State<WhoAmISetupScreen> {
   Widget build(BuildContext context) {
     final palette = AppPalette.of(context);
     final dirtyWordsEnabled = AppScope.of(context).dirtyWordsEnabled;
+    final customWordsCount = AppScope.of(context).customWhoAmIWords.length;
+    final requiresCustomWords =
+        _sourceMode == WordSourceMode.customOnly && customWordsCount == 0;
 
     return AppShell(
       title: 'Кто я',
@@ -151,7 +163,37 @@ class _WhoAmISetupScreenState extends State<WhoAmISetupScreen> {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  'Подбор слов',
+                  'Источник слов',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 12),
+                WordSourceModeSelector(
+                  value: _sourceMode,
+                  onChanged: (value) {
+                    AppScope.of(context).playSound(UiSound.toggleSoft);
+                    setState(() => _sourceMode = value);
+                  },
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  customWordsCount == 0
+                      ? 'Пользовательских слов для "Кто я" пока нет.'
+                      : 'Пользовательских слов для "Кто я": $customWordsCount',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                if (requiresCustomWords) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'Для режима "Только свои" сначала добавьте слова в настройках.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: palette.errorStrong,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 18),
+                Text(
+                  'Режим встроенных слов',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 12),
@@ -174,13 +216,14 @@ class _WhoAmISetupScreenState extends State<WhoAmISetupScreen> {
           const SizedBox(height: 18),
           PrimaryActionButton(
             label: _isGenerating ? 'Генерируем...' : 'Создать код партии',
-            onPressed: _isGenerating ? null : _generate,
+            onPressed: _isGenerating || requiresCustomWords ? null : _generate,
           ),
           if (_isGenerating || _generatedCode != null) ...[
             const SizedBox(height: 24),
             PartySetupCodeCard(
               palette: palette,
               code: _isGenerating ? _animatedCode : _generatedCode!,
+              showQr: !_isGenerating && _generatedCode != null,
               selectedIndex: _selectedPlayerIndex,
               itemCount: _players,
               onChanged:

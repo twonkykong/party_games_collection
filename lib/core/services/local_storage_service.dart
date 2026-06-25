@@ -5,8 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/app_theme_preference.dart';
 import '../models/dictionary_mode.dart';
 import '../models/game_setup_drafts.dart';
+import '../models/game_type.dart';
 import '../models/mafia_preset.dart';
 import '../models/saved_last_party.dart';
+import '../models/word_source_mode.dart';
 
 class LocalStorageService {
   static const _spySetupKey = 'spy_setup';
@@ -14,6 +16,10 @@ class LocalStorageService {
   static const _mafiaSetupKey = 'mafia_setup';
   static const _bunkerSetupKey = 'bunker_setup';
   static const _aliasSetupKey = 'alias_setup';
+  static const _sharedCustomWordsKey = 'custom_words_shared';
+  static const _customWhoAmIWordsKey = 'custom_words_whoami';
+  static const _customAliasWordsKey = 'custom_words_alias';
+  static const _customSpyWordsKey = 'custom_words_spy';
   static const _lastPartyKey = 'last_party';
   static const _themePreferenceKey = 'theme_preference';
   static const _uiSoundsEnabledKey = 'ui_sounds_enabled';
@@ -30,6 +36,7 @@ class LocalStorageService {
         playerCount: 5,
         spyCount: 1,
         dictionaryMode: DictionaryMode.family,
+        wordSourceMode: WordSourceMode.builtIn,
       );
     }
     return SpySetupDraft.fromJson(
@@ -44,6 +51,7 @@ class LocalStorageService {
       return const WhoAmISetupDraft(
         playerCount: 4,
         dictionaryMode: DictionaryMode.family,
+        wordSourceMode: WordSourceMode.builtIn,
       );
     }
     return WhoAmISetupDraft.fromJson(
@@ -89,10 +97,11 @@ class LocalStorageService {
     final jsonString = prefs.getString(_aliasSetupKey);
     if (jsonString == null) {
       return const AliasSetupDraft(
-        teamCount: 2,
+        teamCount: 1,
         roundSeconds: 60,
         targetScore: 30,
         dictionaryMode: DictionaryMode.family,
+        wordSourceMode: WordSourceMode.builtIn,
       );
     }
     return AliasSetupDraft.fromJson(
@@ -163,6 +172,46 @@ class LocalStorageService {
   Future<void> clearLastParty() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_lastPartyKey);
+  }
+
+  Future<List<String>> loadCustomWords(GameType gameType) async {
+    final prefs = await SharedPreferences.getInstance();
+    final sharedValues = prefs.getStringList(_sharedCustomWordsKey);
+    if (sharedValues != null) {
+      return List<String>.from(sharedValues);
+    }
+
+    final merged = <String>[];
+    final seen = <String>{};
+    for (final key in const [
+      _customWhoAmIWordsKey,
+      _customAliasWordsKey,
+      _customSpyWordsKey,
+    ]) {
+      final values = prefs.getStringList(key) ?? const [];
+      for (final value in values) {
+        final normalized = value.trim().replaceAll(RegExp(r'\s+'), ' ');
+        if (normalized.isEmpty) {
+          continue;
+        }
+        final token = normalized.toLowerCase();
+        if (seen.add(token)) {
+          merged.add(normalized);
+        }
+      }
+    }
+    if (merged.isNotEmpty) {
+      await prefs.setStringList(_sharedCustomWordsKey, merged);
+    }
+    return merged;
+  }
+
+  Future<void> saveCustomWords(GameType gameType, List<String> words) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_sharedCustomWordsKey, words);
+    await prefs.remove(_customWhoAmIWordsKey);
+    await prefs.remove(_customAliasWordsKey);
+    await prefs.remove(_customSpyWordsKey);
   }
 
   Future<Map<String, dynamic>> loadJsonState(String key) async {

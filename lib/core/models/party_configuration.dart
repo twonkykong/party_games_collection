@@ -1,6 +1,7 @@
 import 'dictionary_mode.dart';
 import 'game_type.dart';
 import 'party_code_version.dart';
+import 'word_source_mode.dart';
 
 class PartyConfiguration {
   const PartyConfiguration({
@@ -8,6 +9,7 @@ class PartyConfiguration {
     required this.gameType,
     required this.playerCount,
     required this.dictionaryMode,
+    required this.wordSourceMode,
     required this.seed,
     this.spyCount,
     this.mafiaPresetId,
@@ -19,6 +21,7 @@ class PartyConfiguration {
   final GameType gameType;
   final int playerCount;
   final DictionaryMode dictionaryMode;
+  final WordSourceMode wordSourceMode;
   final int seed;
   final int? spyCount;
   final String? mafiaPresetId;
@@ -31,6 +34,7 @@ class PartyConfiguration {
       'gameType': gameType.code,
       'playerCount': playerCount,
       'dictionaryMode': dictionaryMode.code,
+      'wordSourceMode': wordSourceMode.code,
       'seed': seed,
       'spyCount': spyCount,
       'mafiaPresetId': mafiaPresetId,

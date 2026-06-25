@@ -10,13 +10,16 @@ import '../../core/models/game_setup_drafts.dart';
 import '../../core/models/game_type.dart';
 import '../../core/models/party_code_version.dart';
 import '../../core/models/party_configuration.dart';
+import '../../core/models/word_source_mode.dart';
 import '../../core/services/app_scope.dart';
 import '../../core/services/ui_sound_service.dart';
 import '../../shared/widgets/app_shell.dart';
 import '../../shared/widgets/dictionary_mode_slider.dart';
+import '../../shared/widgets/party_qr_code_card.dart';
 import '../../shared/widgets/primary_action_button.dart';
 import '../../shared/widgets/section_card.dart';
 import '../../shared/widgets/setting_stepper.dart';
+import '../../shared/widgets/word_source_mode_selector.dart';
 import '../../shared/widgets/wheel_index_picker.dart';
 
 class AliasSetupScreen extends StatefulWidget {
@@ -32,6 +35,7 @@ class _AliasSetupScreenState extends State<AliasSetupScreen> {
   late int _roundSeconds;
   late int _targetScore;
   late DictionaryMode _mode;
+  late WordSourceMode _sourceMode;
   int _selectedTeamIndex = 1;
   String? _generatedCode;
   bool _isGenerating = false;
@@ -49,6 +53,7 @@ class _AliasSetupScreenState extends State<AliasSetupScreen> {
     _roundSeconds = draft.roundSeconds;
     _targetScore = draft.targetScore;
     _mode = draft.dictionaryMode;
+    _sourceMode = draft.wordSourceMode;
     _initialized = true;
   }
 
@@ -65,6 +70,7 @@ class _AliasSetupScreenState extends State<AliasSetupScreen> {
       gameType: GameType.alias,
       playerCount: _teams,
       dictionaryMode: effectiveMode,
+      wordSourceMode: _sourceMode,
       seed: app.codec.generateSeed(),
       aliasRoundSeconds: _roundSeconds,
       aliasTargetScore: _targetScore,
@@ -77,6 +83,7 @@ class _AliasSetupScreenState extends State<AliasSetupScreen> {
         roundSeconds: _roundSeconds,
         targetScore: _targetScore,
         dictionaryMode: effectiveMode,
+        wordSourceMode: _sourceMode,
       ),
     );
     app.playSound(UiSound.successSoft);
@@ -152,6 +159,9 @@ class _AliasSetupScreenState extends State<AliasSetupScreen> {
   Widget build(BuildContext context) {
     final palette = AppPalette.of(context);
     final dirtyWordsEnabled = AppScope.of(context).dirtyWordsEnabled;
+    final customWordsCount = AppScope.of(context).customAliasWords.length;
+    final requiresCustomWords =
+        _sourceMode == WordSourceMode.customOnly && customWordsCount == 0;
 
     return AppShell(
       title: 'Элиас',
@@ -176,7 +186,7 @@ class _AliasSetupScreenState extends State<AliasSetupScreen> {
                 SettingStepper(
                   label: 'Количество команд',
                   value: _teams,
-                  min: 2,
+                  min: 1,
                   max: 6,
                   onChanged:
                       (value) => setState(() {
@@ -215,7 +225,37 @@ class _AliasSetupScreenState extends State<AliasSetupScreen> {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  'Подбор слов',
+                  'Источник слов',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 12),
+                WordSourceModeSelector(
+                  value: _sourceMode,
+                  onChanged: (value) {
+                    AppScope.of(context).playSound(UiSound.toggleSoft);
+                    setState(() => _sourceMode = value);
+                  },
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  customWordsCount == 0
+                      ? 'Пользовательских слов для Элиаса пока нет.'
+                      : 'Пользовательских слов для Элиаса: $customWordsCount',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                if (requiresCustomWords) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'Для режима "Только свои" сначала добавьте слова в настройках.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: palette.errorStrong,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 18),
+                Text(
+                  'Режим встроенных слов',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 12),
@@ -238,7 +278,7 @@ class _AliasSetupScreenState extends State<AliasSetupScreen> {
           const SizedBox(height: 18),
           PrimaryActionButton(
             label: _isGenerating ? 'Генерируем...' : 'Создать код партии',
-            onPressed: _isGenerating ? null : _generate,
+            onPressed: _isGenerating || requiresCustomWords ? null : _generate,
           ),
           if (_isGenerating || _generatedCode != null) ...[
             const SizedBox(height: 24),
@@ -270,7 +310,12 @@ class _AliasSetupScreenState extends State<AliasSetupScreen> {
                           ?.copyWith(fontSize: 30, letterSpacing: 1.4),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  if (!_isGenerating && _generatedCode != null) ...[
+                    const SizedBox(height: 16),
+                    PartyQrCodeCard(code: _generatedCode!),
+                    const SizedBox(height: 16),
+                  ] else
+                    const SizedBox(height: 16),
                   OutlinedButton.icon(
                     onPressed: () async {
                       final app = AppScope.of(context);

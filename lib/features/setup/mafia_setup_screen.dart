@@ -11,6 +11,7 @@ import '../../core/models/game_type.dart';
 import '../../core/models/mafia_preset.dart';
 import '../../core/models/party_code_version.dart';
 import '../../core/models/party_configuration.dart';
+import '../../core/models/word_source_mode.dart';
 import '../../core/services/app_scope.dart';
 import '../../core/services/ui_sound_service.dart';
 import '../../shared/widgets/app_shell.dart';
@@ -60,6 +61,7 @@ class _MafiaSetupScreenState extends State<MafiaSetupScreen> {
       gameType: GameType.mafia,
       playerCount: _players,
       dictionaryMode: DictionaryMode.family,
+      wordSourceMode: WordSourceMode.builtIn,
       seed: app.codec.generateSeed(),
       mafiaPresetId: _preset.code,
     );
