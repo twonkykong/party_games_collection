@@ -44,10 +44,33 @@
     .platform-ios flt-scene-host {
       overscroll-behavior: none;
     }
+
+    flt-semantics-placeholder {
+      pointer-events: none !important;
+    }
+
+    #app-status-bar-cover {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: env(safe-area-inset-top, 0px);
+      background: #FFF7F0;
+      pointer-events: none;
+      z-index: 2147483647;
+    }
+
+    @supports (height: constant(safe-area-inset-top)) {
+      #app-status-bar-cover {
+        height: constant(safe-area-inset-top);
+      }
+    }
   </style>
 </head>
 
 <body>
+  <div id="app-status-bar-cover" aria-hidden="true"></div>
+
   <script>
     (function () {
       var userAgent = navigator.userAgent || '';
@@ -89,9 +112,39 @@
 
         document.documentElement.style.backgroundColor = color;
         document.body.style.backgroundColor = color;
+
+        var statusCover = document.getElementById('app-status-bar-cover');
+        if (statusCover) {
+          statusCover.style.backgroundColor = color;
+        }
+      }
+
+      function ensureViewportFitCover() {
+        var viewport = document.querySelector('meta[name="viewport"]');
+        if (!viewport) {
+          viewport = document.createElement('meta');
+          viewport.setAttribute('name', 'viewport');
+          document.head.appendChild(viewport);
+        }
+
+        var content = viewport.getAttribute('content') || 'width=device-width, initial-scale=1';
+        if (content.indexOf('viewport-fit=cover') === -1) {
+          viewport.setAttribute('content', content + ', viewport-fit=cover');
+        }
       }
 
       applyChrome();
+      ensureViewportFitCover();
+
+      var headObserver = new MutationObserver(function () {
+        ensureViewportFitCover();
+      });
+      headObserver.observe(document.head, {
+        attributes: true,
+        childList: true,
+        subtree: true,
+        attributeFilter: ['content']
+      });
     })();
   </script>
 

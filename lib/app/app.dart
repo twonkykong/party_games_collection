@@ -88,10 +88,14 @@ class _PartyGamesAppBootstrapState extends State<PartyGamesAppBootstrap> {
                       children: [
                         if (child != null) child,
                         if (isLoading)
-                          ColoredBox(
-                            color: palette.backgroundTop.withValues(alpha: 0.6),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
+                          IgnorePointer(
+                            child: ColoredBox(
+                              color: palette.backgroundTop.withValues(
+                                alpha: 0.6,
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
                             ),
                           ),
                       ],
