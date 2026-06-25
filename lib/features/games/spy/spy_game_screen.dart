@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../../app/app_palette.dart';
 import '../../../core/models/active_party.dart';
+import '../../../core/models/word_source_mode.dart';
 import '../../../core/services/app_scope.dart';
 import '../../../core/services/ui_sound_service.dart';
 import '../../../shared/widgets/app_shell.dart';
 import '../../../shared/widgets/game_completion_sheet.dart';
+import '../../../shared/widgets/missing_custom_words_state.dart';
 import '../../../shared/widgets/party_code_sheet.dart';
 import '../../../shared/widgets/reveal_card.dart';
 import '../../../shared/widgets/retry_state_card.dart';
@@ -42,6 +44,13 @@ class _SpyGameScreenState extends State<SpyGameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    if (widget.activeParty.configuration.wordSourceMode ==
+            WordSourceMode.customOnly &&
+        app.customWords.isEmpty) {
+      return const AppShell(title: 'Шпион', child: MissingCustomWordsState());
+    }
+
     return FutureBuilder<SpyPartyState>(
       future: _partyFuture,
       builder: (context, snapshot) {
@@ -60,10 +69,11 @@ class _SpyGameScreenState extends State<SpyGameScreen> {
               icon: const Icon(Icons.key_rounded),
             ),
             IconButton(
-              onPressed: () => showGameCompletionSheet(
-                context,
-                activeParty: widget.activeParty,
-              ),
+              onPressed:
+                  () => showGameCompletionSheet(
+                    context,
+                    activeParty: widget.activeParty,
+                  ),
               icon: const Icon(Icons.flag_rounded),
             ),
           ],
@@ -125,11 +135,11 @@ class _SpyGameContent extends StatelessWidget {
                     width: 56,
                     height: 56,
                     decoration: BoxDecoration(
-                      color: isSpy ? palette.primarySoft : palette.secondarySoft,
+                      color: palette.secondarySoft,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Icon(
-                      isSpy ? Icons.visibility_off_rounded : Icons.groups_rounded,
+                      Icons.visibility_rounded,
                       color: palette.primaryStrong,
                     ),
                   ),
@@ -144,7 +154,7 @@ class _SpyGameContent extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          isSpy ? 'Секретная роль' : 'Обычный игрок',
+                          'Личная карточка игрока',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
@@ -155,7 +165,10 @@ class _SpyGameContent extends StatelessWidget {
               const SizedBox(height: 14),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: palette.surfaceMuted,
                   borderRadius: BorderRadius.circular(18),
@@ -182,7 +195,7 @@ class _SpyGameContent extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                isSpy ? 'Ты шпион' : 'Твоё слово',
+                'Твоя карточка',
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(fontSize: 24),
@@ -197,9 +210,7 @@ class _SpyGameContent extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               Text(
-                isSpy
-                    ? 'У тебя только одна подсказка. Вычисли общее слово команды.'
-                    : 'У команды общее слово. Обсуждайте и вычисляйте шпиона.',
+                'Запомните эту информацию и не показывайте экран другим игрокам.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),

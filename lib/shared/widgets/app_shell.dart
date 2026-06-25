@@ -142,12 +142,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
             ),
             Column(
               children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 140),
-                  curve: Curves.easeOutCubic,
-                  height: topInset,
-                  color: palette.backgroundTop,
-                ),
+                Container(height: topInset, color: palette.backgroundTop),
                 if (hasHeader)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),

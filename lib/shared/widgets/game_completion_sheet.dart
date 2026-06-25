@@ -6,6 +6,7 @@ import '../../core/models/active_party.dart';
 import '../../core/models/party_configuration.dart';
 import '../../core/services/app_scope.dart';
 import '../../core/services/ui_sound_service.dart';
+import 'app_bottom_sheet_frame.dart';
 import 'section_card.dart';
 
 Future<void> showGameCompletionSheet(
@@ -91,82 +92,66 @@ class _GameCompletionSheet extends StatelessWidget {
     final nextCode = AppScope.of(
       context,
     ).codec.encode(_buildNextConfiguration(context));
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        20,
-        0,
-        20,
-        20 + MediaQuery.paddingOf(context).bottom,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Партия завершена',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Можно сразу перейти к новой партии с теми же настройками и новым кодом, либо вернуться в меню.',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 16),
-            SectionCard(
-              color: palette.surfaceMuted,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Новый код партии',
-                    style: Theme.of(context).textTheme.titleMedium,
+    return AppBottomSheetFrame(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Партия завершена',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Новая партия откроется с теми же настройками и новым кодом.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 16),
+          SectionCard(
+            color: palette.surfaceMuted,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Новый код партии',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 18,
                   ),
-                  const SizedBox(height: 12),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 18,
-                    ),
-                    decoration: BoxDecoration(
-                      color: palette.surface,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Center(
-                      child: SelectableText(
-                        nextCode,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(fontSize: 26, letterSpacing: 1.0),
-                      ),
+                  decoration: BoxDecoration(
+                    color: palette.surface,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: SelectableText(
+                      nextCode,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(fontSize: 26, letterSpacing: 1.0),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'История прошлых игровых экранов больше не накапливается при переходе в следующую партию.',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(height: 1.45),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: () => _openNextGame(context),
-              icon: const Icon(Icons.skip_next_rounded),
-              label: const Text('Следующая игра'),
-            ),
-            const SizedBox(height: 10),
-            OutlinedButton.icon(
-              onPressed: () => _goToMenu(context),
-              icon: const Icon(Icons.home_rounded),
-              label: const Text('В меню'),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: () => _openNextGame(context),
+            icon: const Icon(Icons.skip_next_rounded),
+            label: const Text('Следующая игра'),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: () => _goToMenu(context),
+            icon: const Icon(Icons.home_rounded),
+            label: const Text('В меню'),
+          ),
+        ],
       ),
     );
   }

@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 
 import '../../../app/app_palette.dart';
 import '../../../core/models/active_party.dart';
+import '../../../core/models/word_source_mode.dart';
 import '../../../core/services/app_scope.dart';
 import '../../../core/services/ui_sound_service.dart';
 import '../../../shared/widgets/app_shell.dart';
 import '../../../shared/widgets/game_completion_sheet.dart';
+import '../../../shared/widgets/missing_custom_words_state.dart';
 import '../../../shared/widgets/party_code_sheet.dart';
 import '../../../shared/widgets/primary_action_button.dart';
 import '../../../shared/widgets/retry_state_card.dart';
@@ -164,6 +166,13 @@ class _AliasGameScreenState extends State<AliasGameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    if (widget.activeParty.configuration.wordSourceMode ==
+            WordSourceMode.customOnly &&
+        app.customWords.isEmpty) {
+      return const AppShell(title: 'Элиас', child: MissingCustomWordsState());
+    }
+
     return FutureBuilder<AliasPartyState>(
       future: _partyFuture,
       builder: (context, snapshot) {
@@ -182,10 +191,11 @@ class _AliasGameScreenState extends State<AliasGameScreen> {
               icon: const Icon(Icons.key_rounded),
             ),
             IconButton(
-              onPressed: () => showGameCompletionSheet(
-                context,
-                activeParty: widget.activeParty,
-              ),
+              onPressed:
+                  () => showGameCompletionSheet(
+                    context,
+                    activeParty: widget.activeParty,
+                  ),
               icon: const Icon(Icons.flag_rounded),
             ),
           ],

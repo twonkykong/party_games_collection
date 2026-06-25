@@ -1,10 +1,16 @@
+import 'package:flutter/services.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../app/app_palette.dart';
+import '../../core/services/custom_words_transfer.dart';
 import '../../core/models/app_theme_preference.dart';
 import '../../core/services/app_scope.dart';
 import '../../core/services/ui_sound_service.dart';
+import '../../shared/widgets/app_bottom_sheet_frame.dart';
 import '../../shared/widgets/app_shell.dart';
+import '../../shared/widgets/party_qr_code_card.dart';
+import '../../shared/widgets/party_qr_scan_sheet.dart';
 import '../../shared/widgets/section_card.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -17,6 +23,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _controller = TextEditingController();
   String? _successMessage;
+  bool _wordsVisible = false;
 
   @override
   void dispose() {
@@ -48,6 +55,91 @@ class _SettingsScreenState extends State<SettingsScreen> {
           added > 0
               ? (added == 1 ? 'Слово добавлено.' : 'Добавлено слов: $added.')
               : 'Новых слов не было: дубликаты уже существуют.';
+    });
+    app.playSound(added > 0 ? UiSound.successSoft : UiSound.errorSoft);
+  }
+
+  Future<void> _copyAllWords() async {
+    final app = AppScope.of(context);
+    final words = app.customWords;
+    if (words.isEmpty) {
+      return;
+    }
+    await Clipboard.setData(ClipboardData(text: words.join('\n')));
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _successMessage = 'Список слов скопирован.';
+    });
+    app.playSound(UiSound.successSoft);
+  }
+
+  Future<void> _exportWordsQr() async {
+    final app = AppScope.of(context);
+    final words = app.customWords;
+    if (words.isEmpty) {
+      return;
+    }
+    final payload = CustomWordsTransfer.encode(words);
+    app.playSound(UiSound.tapSoft);
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: AppPalette.of(context).surface,
+      builder: (context) {
+        return AppBottomSheetFrame(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'QR со словами',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Сканируйте этот QR в настройках на другом устройстве, чтобы перенести общий список слов.',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 16),
+              PartyQrCodeCard(
+                code: payload,
+                caption: 'Этот QR переносит только пользовательские слова.',
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _importWordsQr() async {
+    final app = AppScope.of(context);
+    app.playSound(UiSound.tapSoft);
+    final raw = await showPartyQrScannerSheet(context);
+    if (!mounted || raw == null || raw.isEmpty) {
+      return;
+    }
+    final decoded = CustomWordsTransfer.decode(raw);
+    if (decoded == null) {
+      setState(() {
+        _successMessage = 'Это не QR со словами.';
+      });
+      app.playSound(UiSound.errorSoft);
+      return;
+    }
+    final added = await app.addSharedCustomWords(decoded);
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _successMessage =
+          added > 0
+              ? 'Импортировано слов: $added.'
+              : 'Новых слов для импорта не оказалось.';
+      _wordsVisible = true;
     });
     app.playSound(added > 0 ? UiSound.successSoft : UiSound.errorSoft);
   }
@@ -156,9 +248,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _CustomWordsSection(
             inputController: _controller,
             words: controller.customWords,
+            wordsVisible: _wordsVisible,
             successMessage: _successMessage,
             onChanged: () => setState(() {}),
             onAdd: _addWords,
+            onToggleVisibility: () {
+              setState(() => _wordsVisible = !_wordsVisible);
+              controller.playSound(UiSound.toggleSoft);
+            },
+            onCopyAll: _copyAllWords,
+            onExportQr: _exportWordsQr,
+            onImportQr: _importWordsQr,
             onRemove: (word) async {
               await controller.removeSharedCustomWord(word);
               if (!mounted) {
@@ -198,18 +298,28 @@ class _CustomWordsSection extends StatelessWidget {
   const _CustomWordsSection({
     required this.inputController,
     required this.words,
+    required this.wordsVisible,
     required this.successMessage,
     required this.onChanged,
     required this.onAdd,
+    required this.onToggleVisibility,
+    required this.onCopyAll,
+    required this.onExportQr,
+    required this.onImportQr,
     required this.onRemove,
     required this.onClear,
   });
 
   final TextEditingController inputController;
   final List<String> words;
+  final bool wordsVisible;
   final String? successMessage;
   final VoidCallback onChanged;
   final Future<void> Function() onAdd;
+  final VoidCallback onToggleVisibility;
+  final Future<void> Function() onCopyAll;
+  final Future<void> Function() onExportQr;
+  final Future<void> Function() onImportQr;
   final Future<void> Function(String word) onRemove;
   final Future<void> Function() onClear;
 
@@ -260,6 +370,29 @@ class _CustomWordsSection extends StatelessWidget {
             onPressed: preview.isEmpty ? null : onAdd,
             child: Text(addLabel),
           ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              OutlinedButton(
+                onPressed: onToggleVisibility,
+                child: Text(wordsVisible ? 'Скрыть слова' : 'Показать слова'),
+              ),
+              OutlinedButton(
+                onPressed: words.isEmpty ? null : onCopyAll,
+                child: const Text('Скопировать все'),
+              ),
+              OutlinedButton(
+                onPressed: words.isEmpty ? null : onExportQr,
+                child: const Text('Экспорт QR'),
+              ),
+              OutlinedButton(
+                onPressed: onImportQr,
+                child: const Text('Импорт QR'),
+              ),
+            ],
+          ),
           if (successMessage != null) ...[
             const SizedBox(height: 12),
             Container(
@@ -279,7 +412,12 @@ class _CustomWordsSection extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 16),
-          if (words.isEmpty)
+          if (!wordsVisible)
+            Text(
+              'Список скрыт. Откройте его кнопкой выше, если хотите посмотреть или удалить слова.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            )
+          else if (words.isEmpty)
             Text('Пока пусто.', style: Theme.of(context).textTheme.bodyMedium)
           else ...[
             Wrap(

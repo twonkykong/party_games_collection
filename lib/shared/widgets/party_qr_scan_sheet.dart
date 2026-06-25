@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../app/app_palette.dart';
+import 'app_bottom_sheet_frame.dart';
 
 Future<String?> showPartyQrScannerSheet(BuildContext context) {
   final palette = AppPalette.of(context);
@@ -59,100 +60,85 @@ class _PartyQrScannerSheetState extends State<_PartyQrScannerSheet> {
   @override
   Widget build(BuildContext context) {
     final palette = AppPalette.of(context);
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
-
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(20, 8, 20, 16 + bottomInset),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Сканировать QR',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'После распознавания код автоматически подставится и партия сразу проверится.',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: palette.surfaceMuted,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: SizedBox(
-                    height: 360,
-                    child: Stack(
-                      children: [
-                        MobileScanner(
-                          controller: _controller,
-                          fit: BoxFit.cover,
-                          onDetect: _resolveBarcode,
-                          errorBuilder: (context, error) {
-                            return ColoredBox(
-                              color: palette.surfaceMuted,
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(24),
-                                  child: Text(
-                                    'Не удалось открыть камеру. Проверьте разрешение в браузере и попробуйте снова.',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        IgnorePointer(
+    return AppBottomSheetFrame(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Сканировать QR', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          Text(
+            'После распознавания код автоматически подставится и партия сразу проверится.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: palette.surfaceMuted,
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: SizedBox(
+                height: 360,
+                child: Stack(
+                  children: [
+                    MobileScanner(
+                      controller: _controller,
+                      fit: BoxFit.cover,
+                      onDetect: _resolveBarcode,
+                      errorBuilder: (context, error) {
+                        return ColoredBox(
+                          color: palette.surfaceMuted,
                           child: Center(
-                            child: Container(
-                              width: 220,
-                              height: 220,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(28),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 3,
-                                ),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Color(0x33000000),
-                                    blurRadius: 18,
-                                    offset: Offset(0, 8),
-                                  ),
-                                ],
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Text(
+                                'Не удалось открыть камеру. Проверьте разрешение в браузере и попробуйте снова.',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  ),
+                    IgnorePointer(
+                      child: Center(
+                        child: Container(
+                          width: 220,
+                          height: 220,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(28),
+                            border: Border.all(color: Colors.white, width: 3),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x33000000),
+                                blurRadius: 18,
+                                offset: Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 14),
-              OutlinedButton(
-                onPressed: () async {
-                  await _controller.stop();
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Text('Закрыть'),
-              ),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(height: 14),
+          OutlinedButton(
+            onPressed: () async {
+              await _controller.stop();
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text('Закрыть'),
+          ),
+        ],
       ),
     );
   }

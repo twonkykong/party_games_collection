@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class PartyQrCodeCard extends StatelessWidget {
-  const PartyQrCodeCard({required this.code, super.key});
+  const PartyQrCodeCard({
+    required this.code,
+    super.key,
+    this.caption = 'Сканируйте QR-код, чтобы подключиться без ручного ввода',
+  });
 
   final String code;
+  final String caption;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +39,7 @@ class PartyQrCodeCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Сканируйте QR-код, чтобы подключиться без ручного ввода',
+            caption,
             textAlign: TextAlign.center,
             style: Theme.of(
               context,

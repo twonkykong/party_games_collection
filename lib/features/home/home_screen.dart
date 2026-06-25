@@ -71,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Тёплый мобильный формат для компании: один код, один seed, одинаковая партия на каждом телефоне.',
+                  'Тёплый мобильный формат для компании: один код и одна общая партия на каждом телефоне.',
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ],

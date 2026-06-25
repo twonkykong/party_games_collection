@@ -115,7 +115,7 @@ class _JoinPartyScreenState extends State<JoinPartyScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Вставьте код, и приложение восстановит игру, параметры и seed без ручного выбора игры.',
+                  'Вставьте код, чтобы открыть ту же самую партию на этом устройстве.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
@@ -212,7 +212,7 @@ class _JoinPartyScreenState extends State<JoinPartyScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Данные ниже получены напрямую из кода партии.',
+                    'Проверьте игру и выберите свой индекс.',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 14),
@@ -226,13 +226,14 @@ class _JoinPartyScreenState extends State<JoinPartyScreen> {
                     value: '${candidate.configuration.playerCount}',
                   ),
                   const SizedBox(height: 10),
-                  LabeledValueRow(
-                    label: 'Режим',
-                    value: candidate.configuration.dictionaryMode.label,
-                  ),
                   if (candidate.gameType == GameType.spy ||
                       candidate.gameType == GameType.whoAmI ||
                       candidate.gameType == GameType.alias) ...[
+                    const SizedBox(height: 10),
+                    LabeledValueRow(
+                      label: 'Режим',
+                      value: candidate.configuration.dictionaryMode.label,
+                    ),
                     const SizedBox(height: 10),
                     LabeledValueRow(
                       label: 'Источник',

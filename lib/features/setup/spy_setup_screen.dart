@@ -154,7 +154,7 @@ class _SpySetupScreenState extends State<SpySetupScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Код зафиксирует параметры, seed и роли. Хост позже тоже откроет игру только через этот код.',
+                  'Создайте код партии и откройте её на всех устройствах одинаково.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 20),

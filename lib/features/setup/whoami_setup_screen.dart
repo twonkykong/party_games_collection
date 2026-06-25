@@ -144,7 +144,7 @@ class _WhoAmISetupScreenState extends State<WhoAmISetupScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'После генерации даже хост восстановит слова через decode(code) и детерминированный shuffle.',
+                  'Создайте код партии и откройте одинаковую раздачу слов на всех устройствах.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 20),

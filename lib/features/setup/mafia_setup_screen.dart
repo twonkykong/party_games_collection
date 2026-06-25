@@ -141,7 +141,7 @@ class _MafiaSetupScreenState extends State<MafiaSetupScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Код партии фиксирует пресет ролей, число игроков и seed раздачи.',
+                  'Создайте код партии и раздайте роли одинаково на всех устройствах.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 18),

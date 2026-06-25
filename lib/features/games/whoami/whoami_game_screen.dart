@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../../../app/app_palette.dart';
 import '../../../core/models/active_party.dart';
+import '../../../core/models/word_source_mode.dart';
 import '../../../core/services/app_scope.dart';
 import '../../../core/services/ui_sound_service.dart';
 import '../../../shared/widgets/app_shell.dart';
 import '../../../shared/widgets/game_completion_sheet.dart';
 import '../../../shared/widgets/hold_to_reveal_card.dart';
+import '../../../shared/widgets/missing_custom_words_state.dart';
 import '../../../shared/widgets/party_code_sheet.dart';
 import '../../../shared/widgets/retry_state_card.dart';
 import '../../../shared/widgets/section_card.dart';
@@ -80,6 +82,13 @@ class _WhoAmIGameScreenState extends State<WhoAmIGameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    if (widget.activeParty.configuration.wordSourceMode ==
+            WordSourceMode.customOnly &&
+        app.customWords.isEmpty) {
+      return const AppShell(title: 'Кто я', child: MissingCustomWordsState());
+    }
+
     return FutureBuilder<WhoAmIPartyState>(
       future: _partyFuture,
       builder: (context, snapshot) {
@@ -98,10 +107,11 @@ class _WhoAmIGameScreenState extends State<WhoAmIGameScreen> {
               icon: const Icon(Icons.key_rounded),
             ),
             IconButton(
-              onPressed: () => showGameCompletionSheet(
-                context,
-                activeParty: widget.activeParty,
-              ),
+              onPressed:
+                  () => showGameCompletionSheet(
+                    context,
+                    activeParty: widget.activeParty,
+                  ),
               icon: const Icon(Icons.flag_rounded),
             ),
           ],
@@ -175,7 +185,7 @@ class _WhoAmIGameContent extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                'Кнопка шапки показывает код партии, а переключатель ниже меняет режим просмотра без изменения партии.',
+                'Переключайте режим просмотра так, как удобнее вашей компании.',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
