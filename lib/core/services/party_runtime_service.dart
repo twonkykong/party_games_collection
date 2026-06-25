@@ -230,15 +230,9 @@ class PartyRuntimeService {
       customWords: customWords,
       sourceMode: configuration.wordSourceMode,
     );
-    final random = DeterministicRandom(configuration.seed);
-    final deck =
-        random
-            .shuffled(sourceWords)
-            .map((entry) => entry.value)
-            .take(120)
-            .toList();
-    return AliasPartyState(
-      words: deck,
+    return resolveAliasParty(
+      words: sourceWords.map((entry) => entry.value).toList(growable: false),
+      seed: configuration.seed,
       teamCount: configuration.playerCount,
       roundSeconds: configuration.aliasRoundSeconds ?? 60,
       targetScore: configuration.aliasTargetScore ?? 30,

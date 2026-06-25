@@ -176,6 +176,7 @@ class _SpyGameContent extends StatelessWidget {
                 ),
                 child: Text(
                   'Начинает игрок ${state.startingPlayerIndex}',
+                  textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),

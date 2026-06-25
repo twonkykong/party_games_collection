@@ -8,6 +8,7 @@ import 'package:party_games_collection/core/services/party_code_codec.dart';
 import 'package:party_games_collection/core/models/word_source_mode.dart';
 import 'package:party_games_collection/data/models/spy_word_entry.dart';
 import 'package:party_games_collection/data/models/whoami_word_entry.dart';
+import 'package:party_games_collection/features/games/alias/alias_party_state.dart';
 import 'package:party_games_collection/features/games/spy/spy_party_state.dart';
 import 'package:party_games_collection/features/games/whoami/whoami_party_state.dart';
 
@@ -127,6 +128,31 @@ void main() {
       first.assignments.values.map((item) => item.value).toList(),
       second.assignments.values.map((item) => item.value).toList(),
     );
+    expect(first.startingPlayerIndex, second.startingPlayerIndex);
+    expect(first.startingPlayerIndex, inInclusiveRange(1, 5));
+  });
+
+  test('alias generation is deterministic for deck and starting team', () {
+    final words = List.generate(12, (index) => 'word_$index');
+
+    final first = resolveAliasParty(
+      words: words,
+      seed: 20240625,
+      teamCount: 4,
+      roundSeconds: 90,
+      targetScore: 30,
+    );
+    final second = resolveAliasParty(
+      words: words,
+      seed: 20240625,
+      teamCount: 4,
+      roundSeconds: 90,
+      targetScore: 30,
+    );
+
+    expect(first.words, second.words);
+    expect(first.startingTeamIndex, second.startingTeamIndex);
+    expect(first.startingTeamIndex, inInclusiveRange(1, 4));
   });
 
   test('spy generation is deterministic for word, hint and spy roles', () {

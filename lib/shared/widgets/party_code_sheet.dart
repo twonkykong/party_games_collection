@@ -24,16 +24,18 @@ Future<void> showPartyCodeSheet(
     isScrollControlled: true,
     useSafeArea: true,
     showDragHandle: false,
-    backgroundColor: palette.surface,
+    backgroundColor: Colors.transparent,
     builder: (context) {
       final app = AppScope.of(context);
       return AppBottomSheetFrame(
-        child: Column(
+        header: Text(
+          'Код партии',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        body: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Код партии', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 16),
             SectionCard(
               color: palette.surfaceMuted,
               child: Column(
@@ -133,6 +135,7 @@ Future<void> showPartyCodeSheet(
             ),
           ],
         ),
+        child: const SizedBox.shrink(),
       );
     },
   );

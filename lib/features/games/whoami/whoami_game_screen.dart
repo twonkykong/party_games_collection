@@ -29,7 +29,6 @@ class _WhoAmIGameScreenState extends State<WhoAmIGameScreen> {
   WhoAmIViewMode _mode = WhoAmIViewMode.forehead;
   bool _revealed = false;
   Future<WhoAmIPartyState>? _partyFuture;
-  bool _starterShown = false;
 
   @override
   void didChangeDependencies() {
@@ -55,29 +54,6 @@ class _WhoAmIGameScreenState extends State<WhoAmIGameScreen> {
   Future<void> _hide() async {
     setState(() => _revealed = false);
     AppScope.of(context).playSound(UiSound.cardHide);
-  }
-
-  void _showStarterOnce() {
-    if (_starterShown) {
-      return;
-    }
-    _starterShown = true;
-    final starter =
-        (widget.activeParty.configuration.seed.abs() %
-            widget.activeParty.configuration.playerCount) +
-        1;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Начинает игрок $starter'),
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    });
   }
 
   @override
@@ -128,18 +104,15 @@ class _WhoAmIGameScreenState extends State<WhoAmIGameScreen> {
                     ).runtime.buildWhoAmIPartyFromCode(widget.activeParty.code);
                   }),
             ),
-            _ => () {
-              _showStarterOnce();
-              return _WhoAmIGameContent(
-                activeParty: widget.activeParty,
-                state: snapshot.data!,
-                mode: _mode,
-                revealed: _revealed,
-                onModeChanged: _setMode,
-                onReveal: _reveal,
-                onHide: _hide,
-              );
-            }(),
+            _ => _WhoAmIGameContent(
+              activeParty: widget.activeParty,
+              state: snapshot.data!,
+              mode: _mode,
+              revealed: _revealed,
+              onModeChanged: _setMode,
+              onReveal: _reveal,
+              onHide: _hide,
+            ),
           },
         );
       },
@@ -206,6 +179,24 @@ class _WhoAmIGameContent extends StatelessWidget {
                 onSelectionChanged: (selection) {
                   onModeChanged(selection.first);
                 },
+              ),
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: palette.surfaceMuted,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: palette.outline),
+                ),
+                child: Text(
+                  'Начинает игрок ${state.startingPlayerIndex}',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
             ],
           ),

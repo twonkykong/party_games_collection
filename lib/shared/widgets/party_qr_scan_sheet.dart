@@ -5,13 +5,11 @@ import '../../app/app_palette.dart';
 import 'app_bottom_sheet_frame.dart';
 
 Future<String?> showPartyQrScannerSheet(BuildContext context) {
-  final palette = AppPalette.of(context);
-
   return showModalBottomSheet<String>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    backgroundColor: palette.surface,
+    backgroundColor: Colors.transparent,
     builder: (context) => const _PartyQrScannerSheet(),
   );
 }
@@ -61,8 +59,8 @@ class _PartyQrScannerSheetState extends State<_PartyQrScannerSheet> {
   Widget build(BuildContext context) {
     final palette = AppPalette.of(context);
     return AppBottomSheetFrame(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      maxHeightFactor: 0.78,
+      header: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text('Сканировать QR', style: Theme.of(context).textTheme.titleLarge),
@@ -71,7 +69,12 @@ class _PartyQrScannerSheetState extends State<_PartyQrScannerSheet> {
             'После распознавания код автоматически подставится и партия сразу проверится.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          const SizedBox(height: 16),
+        ],
+      ),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -140,6 +143,7 @@ class _PartyQrScannerSheetState extends State<_PartyQrScannerSheet> {
           ),
         ],
       ),
+      child: const SizedBox.shrink(),
     );
   }
 }

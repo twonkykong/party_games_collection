@@ -19,7 +19,7 @@ Future<void> showGameCompletionSheet(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    backgroundColor: palette.surface,
+    backgroundColor: Colors.transparent,
     builder:
         (context) =>
             _GameCompletionSheet(activeParty: activeParty, palette: palette),
@@ -93,8 +93,7 @@ class _GameCompletionSheet extends StatelessWidget {
       context,
     ).codec.encode(_buildNextConfiguration(context));
     return AppBottomSheetFrame(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      header: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
@@ -106,7 +105,12 @@ class _GameCompletionSheet extends StatelessWidget {
             'Новая партия откроется с теми же настройками и новым кодом.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          const SizedBox(height: 16),
+        ],
+      ),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
           SectionCard(
             color: palette.surfaceMuted,
             child: Column(
@@ -153,6 +157,7 @@ class _GameCompletionSheet extends StatelessWidget {
           ),
         ],
       ),
+      child: const SizedBox.shrink(),
     );
   }
 }

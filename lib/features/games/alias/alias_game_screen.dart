@@ -36,7 +36,6 @@ class _AliasGameScreenState extends State<AliasGameScreen> {
   Timer? _timer;
   bool _loaded = false;
   Future<AliasPartyState>? _partyFuture;
-  bool _starterShown = false;
 
   @override
   void dispose() {
@@ -141,29 +140,6 @@ class _AliasGameScreenState extends State<AliasGameScreen> {
     await _saveLocalState();
   }
 
-  void _showStarterOnce() {
-    if (_starterShown) {
-      return;
-    }
-    _starterShown = true;
-    final starter =
-        (widget.activeParty.configuration.seed.abs() %
-            widget.activeParty.configuration.playerCount) +
-        1;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Начинает команда $starter'),
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
@@ -212,20 +188,17 @@ class _AliasGameScreenState extends State<AliasGameScreen> {
                     ).runtime.buildAliasPartyFromCode(widget.activeParty.code);
                   }),
             ),
-            _ => () {
-              _showStarterOnce();
-              return _AliasGameContent(
-                activeParty: widget.activeParty,
-                state: snapshot.data!,
-                score: _score,
-                secondsLeft: _secondsLeft,
-                roundScore: _roundScore,
-                phase: _phase,
-                wordOffset: _wordOffset,
-                onStartRound: _startRound,
-                onResolveWord: _resolveWord,
-              );
-            }(),
+            _ => _AliasGameContent(
+              activeParty: widget.activeParty,
+              state: snapshot.data!,
+              score: _score,
+              secondsLeft: _secondsLeft,
+              roundScore: _roundScore,
+              phase: _phase,
+              wordOffset: _wordOffset,
+              onStartRound: _startRound,
+              onResolveWord: _resolveWord,
+            ),
           },
         );
       },
@@ -310,6 +283,16 @@ class _AliasGameContent extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SectionCard(
+          color: palette.surfaceMuted,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Text(
+            'Начинает команда ${state.startingTeamIndex}',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
         const SizedBox(height: 18),
