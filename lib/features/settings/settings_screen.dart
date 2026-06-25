@@ -13,6 +13,8 @@ import '../../shared/widgets/party_qr_code_card.dart';
 import '../../shared/widgets/party_qr_scan_sheet.dart';
 import '../../shared/widgets/section_card.dart';
 
+const _appBuildLabel = 'v1.0';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -287,6 +289,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
           const SizedBox(height: 16),
+          Text(
+            _appBuildLabel,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: palette.textSecondary.withValues(alpha: 0.8),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
           Text(
             'by twonkykong',
             textAlign: TextAlign.center,
